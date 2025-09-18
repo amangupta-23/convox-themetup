@@ -13,15 +13,13 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
+// --- Removed: const express = require('express'); (etc.) ---
 
 const app = express();
 
 // Allow requests only from your Netlify site
 const corsOptions = {
-  origin: 'https://convoxthemetup.netlify.app'
+    origin: 'https://convoxthemetup.netlify.app'
 };
 
 app.use(cors(corsOptions));
@@ -36,7 +34,7 @@ console.log('MONGO_URI from env:', process.env.MONGO_URI ? 'Set' : 'Not Set');
 const MONGODB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/videocall';
 
 mongoose
-    .connect(MONGODB_URI) 
+    .connect(MONGODB_URI)
     .then(() => console.log('✅ MongoDB connected!'))
     .catch(err => {
         console.error('❌ MongoDB connection error:', err.message);
@@ -59,7 +57,7 @@ const io = new Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } 
 
 // Global state to track active users and their location/info
 const userSocketMap = new Map();
-const emailToSocketIdMap = new Map(); 
+const emailToSocketIdMap = new Map();
 
 // Express API Routes
 
