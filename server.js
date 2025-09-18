@@ -21,13 +21,14 @@ const app = express();
 // --- CORS Configuration (Express App) ---
 // Sirf Netlify site se aane wali requests ko allow karein.
 // Aapki Netlify site ka URL yahaan par daalein.
-const NETLIFY_ORIGIN = 'https://convoxthemetup.netlify.app';
+const NETLIFY_ORIGIN = 'https://convoxthemeetup.netlify.app';
 
 const corsOptions = {
     origin: NETLIFY_ORIGIN
 };
 
-app.use(cors(corsOptions));
+// Netlify site ko requests bhejney ki anumati dega
+app.use(cors(corsOptions)); 
 app.use(express.json());
 
 // MongoDB Connection & Schema
