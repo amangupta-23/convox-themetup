@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Convox Elite - Live Meeting</title>
+    <script src="https://kit.fontawesome.com/a7b1b11b13.js" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* General Body & Fonts */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #121212; /* Darker background */
+            color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            flex-shrink: 0; /* Prevent navbar from shrinking */
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Main Content Layout */
+        .main-content {
+            display: flex;
+            flex-grow: 1; /* Take remaining vertical space */
+            overflow: hidden; /* Important for child scrolling */
+        }
+
+        /* Video Grid Area */
+        .video-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto; /* Allow this area to scroll if content overflows */
+        }
+
+        .meeting-info {
+            text-align: center;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        .meeting-info h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        .meeting-info p {
+            color: #aaa;
+        }
+
+        #video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* Individual Video Participant Styling */
+        .video-container {
+            position: relative;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden; /* Ensures video stays within rounded corners */
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .video-container:hover {
+            border-color: #3498db;
+        }
+
+        .video-participant {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            display: block; /* Removes bottom space under video */
+        }
+
+        .name-tag {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Participants Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: #181818;
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            overflow-y: auto;
+            flex-shrink: 0; /* Prevent sidebar from shrinking */
+        }
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #444;
+            padding-bottom: 0.5rem;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar li {
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            word-break: break-word;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .sidebar li:last-child {
+            border-bottom: none;
+        }
+
+        /* Controls Bar */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(15px);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            z-index: 1000;
+            border: 1px solid #444;
+        }
+
+        .controls button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #4b4b4b;
+            border: none;
+            border-radius: 50%;
+            width: 55px; /* Slightly larger */
+            height: 55px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .controls button:hover {
+            background: #6a6a6a;
+            transform: translateY(-3px); /* Add a slight lift */
+        }
+        
+        /* Style for buttons when their function is 'off' (e.g., mic is muted) */
+        .controls button[aria-pressed="false"] {
+            background-color: #cc3333;
+        }
+        .controls button[aria-pressed="false"]:hover {
+            background-color: #e54545;
+        }
+
+        .controls .icon {
+            font-size: 1.3rem;
+            margin-bottom: 4px; /* Space between icon and label */
+        }
+        .controls .label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        #end-call-btn {
+            background: #e53e3e; /* Always red */
+        }
+        #end-call-btn:hover {
+            background: #c53030;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                box-sizing: border-box;
+                max-height: 200px; /* Limit height on mobile */
+                border-left: none;
+                border-top: 1px solid #333;
+            }
+            .video-area {
+                padding: 15px;
+            }
+            #video-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            .controls {
+                width: 95%;
+                bottom: 10px;
+                padding: 0.5rem;
+                justify-content: space-around;
+                gap: 0.5rem;
+            }
+            .controls button {
+                width: 50px;
+                height: 50px;
+            }
+            .controls .icon {
+                font-size: 1.1rem;
+                margin-bottom: 0;
+            }
+            .controls .label {
+                display: none; /* Hide labels on mobile to save space */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">Convox Elite</div>
+    </header>
+
+    <div class="main-content">
+        <main class="video-area">
+            <div class="meeting-info">
+                <h1>Live Meeting</h1>
+                <p>Meeting ID: <strong id="meeting-id-display"></strong></p>
+            </div>
+            <div id="video-grid">
+                </div>
+        </main>
+
+        <aside class="sidebar">
+            <h2>Participants</h2>
+            <ul id="participants"></ul>
+        </aside>
+    </div>
+
+    <div class="controls" role="toolbar" aria-label="Meeting controls">
+        <button id="toggle-audio-btn" title="Toggle Audio" aria-pressed="true">
+            <i id="audio-icon" class="fas fa-microphone icon"></i>
+            <span id="audio-label" class="label">Mute</span>
+        </button>
+        <button id="toggle-video-btn" title="Toggle Video" aria-pressed="true">
+            <i id="video-icon" class="fas fa-video icon"></i>
+            <span id="video-label" class="label">Stop</span>
+        </button>
+        <button id="toggle-screen-share-btn" title="Screen Share" aria-pressed="false">
+            <i id="screenshare-icon" class="fas fa-desktop icon"></i>
+            <span id="screenshare-label" class="label">Share</span>
+        </button>
+        <button id="start-recording-btn" title="Start Recording" aria-pressed="false">
+            <i id="recording-icon" class="fas fa-record-vinyl icon"></i>
+            <span id="recording-label" class="label">Record</span>
+        </button>
+        <button id="end-call-btn" title="End Call">
+            <i class="fas fa-phone-slash icon"></i>
+            <span class="label">End</span>
+        </button>
+    </div>
+
+    <script>
+        // Browser compatibility check
+        const RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
+        const RTCIceCandidate = window.RTCIceCandidate || window.mozRTCIceCandidate || window.webkitRTCIceCandidate;
+
+        const socket = io();
+
+        const videoGrid = document.getElementById('video-grid');
+        const myVideo = document.createElement('video');
+        myVideo.muted = true;
+        myVideo.id = 'my-video';
+        const peers = {}; // Key: remoteSocketId, Value: RTCPeerConnection object
+
+        // Get Meeting and User Details
+        const urlParams = new URLSearchParams(window.location.search);
+        const meetingId = urlParams.get('id');
+        const name = localStorage.getItem('userName') || 'Guest';
+        const email = localStorage.getItem('userEmail') || 'guest@example.com';
+        
+        // Display Meeting ID
+        document.getElementById('meeting-id-display').textContent = meetingId || 'N/A';
+
+        // ----------------------------------------------------
+        // 1. STUN/TURN Server Configuration
+        // ----------------------------------------------------
+        const configuration = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' }
+            ]
+        };
+
+        let localStream;
+        let screenShareStream = null;
+        const participants = {}; // Local state for participant list UI
+
+
+        // ----------------------------------------------------
+        // Core Functions (UPDATED)
+        // ----------------------------------------------------
+
+        // Function to display the video stream in the HTML with a container and name tag
+        function addVideoStream(videoElement, stream, userName) {
+            const videoContainer = document.createElement('div');
+            videoContainer.classList.add('video-container');
+            if (videoElement.id) {
+                videoContainer.id = `container-${videoElement.id}`;
+            }
+
+            const nameTag = document.createElement('div');
+            nameTag.classList.add('name-tag');
+            nameTag.textContent = userName;
+
+            videoElement.srcObject = stream;
+            videoElement.addEventListener('loadedmetadata', () => {
+                videoElement.play();
+            });
+            videoElement.classList.add('video-participant');
+
+            videoContainer.append(videoElement);
+            videoContainer.append(nameTag);
+            videoGrid.append(videoContainer);
+        }
+
+        // Function to initialize the RTCPeerConnection
+        function createPeerConnection(targetSocketId) {
+            const peer = new RTCPeerConnection(configuration);
+            peers[targetSocketId] = peer;
+
+            // Add local tracks to the connection
+            if (localStream) {
+                localStream.getTracks().forEach(track => {
+                    peer.addTrack(track, localStream);
+                });
+            }
+
+            // --- Event 1: Receiving Remote Stream ---
+            peer.ontrack = (event) => {
+                const remoteVideo = document.createElement('video');
+                remoteVideo.id = `video-${targetSocketId}`;
+                remoteVideo.classList.add('remote-video');
+                const remoteUserName = participants[targetSocketId]?.name || 'Guest';
+                addVideoStream(remoteVideo, event.streams[0], remoteUserName); // UPDATED CALL
+                console.log(`✅ Remote stream from ${targetSocketId} received.`);
+            };
+
+            // --- Event 2: ICE Candidate Exchange ---
+            peer.onicecandidate = (event) => {
+                if (event.candidate) {
+                    socket.emit('ice-candidate', {
+                        candidate: event.candidate,
+                        toSocketId: targetSocketId
+                    });
+                }
+            };
+            
+            return peer;
+        }
+
+        // Main function to start media and join the room
+        async function startMedia(meetingId, name, email) {
+            if (!meetingId || !name || !email) {
+                return console.error("Missing meeting details.");
+            }
+            try {
+                // 1. Get local media (camera and microphone)
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                addVideoStream(myVideo, localStream, name + ' (You)'); // UPDATED CALL
+
+                // 2. Inform server that this user has joined and is ready
+                socket.emit('join-room', { meetingId, name, email });
+                
+                // Add self to participant list
+                participants[socket.id] = { name, email, socketId: socket.id };
+                renderParticipants();
+
+            } catch (err) {
+                console.error('❌ Error accessing media:', err);
+                alert('Could not get access to your camera and microphone! Please check permissions.');
+            }
+        }
+        
+        // ----------------------------------------------------
+        // UI and Controls Logic (UPDATED)
+        // ----------------------------------------------------
+        const participantsList = document.getElementById('participants');
+        const toggleAudioBtn = document.getElementById('toggle-audio-btn');
+        const toggleVideoBtn = document.getElementById('toggle-video-btn');
+        const toggleScreenShareBtn = document.getElementById('toggle-screen-share-btn');
+        const endCallBtn = document.getElementById('end-call-btn');
+        const audioIcon = document.getElementById('audio-icon');
+        const audioLabel = document.getElementById('audio-label');
+        const videoIcon = document.getElementById('video-icon');
+        const videoLabel = document.getElementById('video-label');
+        const screenshareIcon = document.getElementById('screenshare-icon');
+        const screenshareLabel = document.getElementById('screenshare-label');
+        
+        // UI: Renders the participant list
+        function renderParticipants(){
+            participantsList.innerHTML='';
+            Object.values(participants).forEach(u=>{
+                const li=document.createElement('li');
+                li.textContent = u.name + (u.socketId === socket.id ? ' (You)' : '');
+                participantsList.appendChild(li);
+            });
+        }
+
+        // UI: Toggle Audio (UPDATED)
+        toggleAudioBtn.addEventListener('click', ()=>{
+            if(!localStream) return;
+            const track = localStream.getAudioTracks()[0];
+            if (!track) return;
+
+            track.enabled = !track.enabled;
+            const isEnabled = track.enabled;
+            
+            toggleAudioBtn.setAttribute('aria-pressed', isEnabled);
+            audioIcon.className = isEnabled ? 'fas fa-microphone icon' : 'fas fa-microphone-slash icon';
+            audioLabel.textContent = isEnabled ? 'Mute':'Unmute';
+        });
+
+        // UI: Toggle Video (UPDATED)
+        toggleVideoBtn.addEventListener('click', ()=>{
+            if(!localStream) return;
+            const track = localStream.getVideoTracks()[0];
+            if (!track) return;
+            
+            track.enabled = !track.enabled;
+            const isEnabled = track.enabled;
+            
+            toggleVideoBtn.setAttribute('aria-pressed', isEnabled);
+            videoIcon.className = isEnabled ? 'fas fa-video icon':'fas fa-video-slash icon';
+            videoLabel.textContent = isEnabled ? 'Stop':'Start';
+        });
+
+        // UI: Toggle Screen Share
+        toggleScreenShareBtn.addEventListener('click', async ()=>{
+            if(!localStream) return alert('Start camera/mic first.');
+
+            if(screenShareStream){
+                // Stop screen share
+                screenShareStream.getTracks().forEach(t=>t.stop());
+                screenShareStream = null;
+                
+                // Switch back to camera stream and tell peers to switch
+                // NOTE: Proper track switching requires a loop through all peers and peer.getSenders()
+                // For simplicity here, we only switch the local display.
+                myVideo.srcObject = localStream;
+                screenshareIcon.className='fas fa-desktop icon';
+                screenshareLabel.textContent='Share';
+                toggleVideoBtn.disabled=false;
+            } else {
+                // Start screen share
+                try{
+                    screenShareStream = await navigator.mediaDevices.getDisplayMedia({video:true});
+                    
+                    // Stop screen share if user clicks 'Stop Sharing' button in the browser UI
+                    screenShareStream.getVideoTracks()[0].onended = () => {
+                        toggleScreenShareBtn.click(); // Re-trigger the click to reset
+                    };
+
+                    // Switch to screen share stream on local display
+                    myVideo.srcObject = screenShareStream;
+                    screenshareIcon.className='fas fa-stop-circle icon';
+                    screenshareLabel.textContent='Stop';
+                    toggleVideoBtn.disabled=true;
+                    // NOTE: Real track switching logic would go here: 
+                    // loop through peers and replaceTrack(oldVideoTrack, newScreenTrack)
+                }catch(err){console.error(err); alert('Cannot share screen');}
+            }
+        });
+
+        // UI: End Call
+        endCallBtn.addEventListener('click', ()=>{
+            if(localStream) localStream.getTracks().forEach(t=>t.stop());
+            if(screenShareStream) screenShareStream.getTracks().forEach(t=>t.stop());
+            
+            // Close all peer connections
+            Object.values(peers).forEach(p => p.close());
+
+            // Redirect back to index/home page
+            window.location.href='index.html';
+        });
+        
+        // Note: Recording logic (startRecordingBtn) is not implemented.
+
+        // ----------------------------------------------------
+        // Socket.IO Signaling Handlers (The WebRTC Connection Logic)
+        // ----------------------------------------------------
+
+        // A. EXISTING USERS: Naya user unhe call karega (Sends Offer)
+        socket.on('existing-participants', async (existingParticipants) => {
+            console.log('Existing users found:', existingParticipants);
+            
+            existingParticipants.forEach(async (participant) => {
+                const targetSocketId = participant.socketId;
+                participants[targetSocketId] = participant; // Add to UI list
+                
+                const peer = createPeerConnection(targetSocketId);
+
+                try {
+                    const offer = await peer.createOffer();
+                    await peer.setLocalDescription(offer);
+                    socket.emit('call-user', { offer: offer, toSocketId: targetSocketId });
+                    console.log(`📞 Sending call offer to: ${participant.name} (${targetSocketId})`);
+                } catch (error) {
+                    console.error("Error creating or sending offer:", error);
+                }
+            });
+            renderParticipants();
+        });
+
+
+        // B. NEW USER CONNECTED: Existing users naye user ke call ke liye taiyar honge
+        socket.on('user-connected', (user) => {
+            console.log(`👤 New user connected: ${user.name} (${user.socketId}). Preparing to receive call.`);
+            
+            participants[user.socketId] = user; // Add to UI list
+            renderParticipants();
+            
+            // Existing user naye user ke liye Peer Connection banayega.
+            createPeerConnection(user.socketId);
+        });
+
+
+        // C. INCOMING CALL: Pehle se maujood user naye user ki call uthayega (Receives Offer, Sends Answer)
+        socket.on('incoming-call', async ({ offer, from, fromName }) => {
+            console.log(`Incoming call from: ${fromName} (${from})`);
+            
+            let peer = peers[from]; 
+            if (!peer) {
+                // Should have been created in 'user-connected', but fallback if needed
+                peer = createPeerConnection(from);
+            }
+
+            try {
+                await peer.setRemoteDescription(new RTCSessionDescription(offer));
+                const answer = await peer.createAnswer();
+                await peer.setLocalDescription(answer);
+
+                socket.emit('make-answer', { answer: answer, toSocketId: from });
+                console.log(`🎙️ Sending answer back to ${fromName}.`);
+            } catch (error) {
+                console.error("Error handling incoming call:", error);
+            }
+        });
+
+
+        // D. ANSWER MADE: Naye user ko call ka jawab mila (Receives Answer)
+        socket.on('answer-made', async ({ answer, from }) => {
+            const peer = peers[from];
+            if (peer) {
+                console.log(`Answer received from ${from}. Setting remote description.`);
+                try {
+                    await peer.setRemoteDescription(new RTCSessionDescription(answer));
+                } catch (error) {
+                    console.error("Error setting answer as remote description:", error);
+                }
+            }
+        });
+
+
+        // E. ICE CANDIDATE: Network information exchange
+        socket.on('ice-candidate', async ({ candidate, from }) => {
+            const peer = peers[from];
+            if (peer && candidate) {
+                try {
+                    await peer.addIceCandidate(new RTCIceCandidate(candidate));
+                } catch (e) {
+                    console.error('Error adding received ICE candidate:', e);
+                }
+            }
+        });
+
+        // F. USER DISCONNECTED (UPDATED)
+        socket.on('user-disconnected', ({ socketId }) => {
+            if (peers[socketId]) {
+                peers[socketId].close(); 
+                delete peers[socketId];
+                
+                // Remove the participant from the list
+                delete participants[socketId];
+                renderParticipants();
+
+                // Remove the video container from the DOM
+                const videoContainer = document.getElementById(`container-video-${socketId}`);
+                if (videoContainer) {
+                    videoContainer.remove();
+                }
+                console.log(`User ${socketId} disconnected. Video removed.`);
+            }
+        });
+
+        // Start the process when the script loads
+        if (meetingId && name && email) {
+            startMedia(meetingId, name, email);
+        } else {
+            alert('Missing meeting details. Redirecting to home.');
+            window.location.href = '/';
+        }
+
+    </script>
+</body>
+</html>
