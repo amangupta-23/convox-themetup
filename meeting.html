@@ -203,6 +203,17 @@
         #end-call-btn:hover {
             background: #c53030;
         }
+        
+        /* Disable style */
+        .controls button:disabled {
+            background: #2a2a2a;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .controls button:disabled:hover {
+            background: #2a2a2a;
+            transform: none;
+        }
 
         /* Responsive Design */
         @media (max-width: 900px) {
@@ -255,7 +266,7 @@
                 <p>Meeting ID: <strong id="meeting-id-display"></strong></p>
             </div>
             <div id="video-grid">
-                </div>
+            </div>
         </main>
 
         <aside class="sidebar">
@@ -277,7 +288,7 @@
             <i id="screenshare-icon" class="fas fa-desktop icon"></i>
             <span id="screenshare-label" class="label">Share</span>
         </button>
-        <button id="start-recording-btn" title="Start Recording" aria-pressed="false">
+        <button id="start-recording-btn" title="Start Recording" aria-pressed="false" disabled>
             <i id="recording-icon" class="fas fa-record-vinyl icon"></i>
             <span id="recording-label" class="label">Record</span>
         </button>
@@ -320,20 +331,21 @@
 
         let localStream;
         let screenShareStream = null;
+        let originalVideoTrack; // To store the original video track for easy switch back
         const participants = {}; // Local state for participant list UI
 
 
         // ----------------------------------------------------
-        // Core Functions (UPDATED)
+        // Core Functions (IMPROVED)
         // ----------------------------------------------------
 
         // Function to display the video stream in the HTML with a container and name tag
         function addVideoStream(videoElement, stream, userName) {
             const videoContainer = document.createElement('div');
             videoContainer.classList.add('video-container');
-            if (videoElement.id) {
-                videoContainer.id = `container-${videoElement.id}`;
-            }
+            // Use socket.id to ensure the container ID is unique and traceable
+            const videoId = videoElement.id.replace('video-', '');
+            videoContainer.id = `container-${videoId}`; 
 
             const nameTag = document.createElement('div');
             nameTag.classList.add('name-tag');
@@ -347,7 +359,12 @@
 
             videoContainer.append(videoElement);
             videoContainer.append(nameTag);
-            videoGrid.append(videoContainer);
+            
+            // Check if element already exists before appending
+            const existingContainer = document.getElementById(`container-${videoId}`);
+            if (!existingContainer) {
+                videoGrid.append(videoContainer);
+            }
         }
 
         // Function to initialize the RTCPeerConnection
@@ -364,12 +381,22 @@
 
             // --- Event 1: Receiving Remote Stream ---
             peer.ontrack = (event) => {
-                const remoteVideo = document.createElement('video');
-                remoteVideo.id = `video-${targetSocketId}`;
-                remoteVideo.classList.add('remote-video');
-                const remoteUserName = participants[targetSocketId]?.name || 'Guest';
-                addVideoStream(remoteVideo, event.streams[0], remoteUserName); // UPDATED CALL
-                console.log(`✅ Remote stream from ${targetSocketId} received.`);
+                const stream = event.streams[0];
+                const remoteVideoId = `video-${targetSocketId}`;
+                let remoteVideo = document.getElementById(remoteVideoId);
+
+                // If video element already exists (e.g., from an earlier stream update), just update srcObject
+                if (remoteVideo) {
+                    remoteVideo.srcObject = stream;
+                } else {
+                    // Create new video element if it's the first time
+                    remoteVideo = document.createElement('video');
+                    remoteVideo.id = remoteVideoId;
+                    remoteVideo.classList.add('remote-video');
+                    const remoteUserName = participants[targetSocketId]?.name || 'Guest';
+                    addVideoStream(remoteVideo, stream, remoteUserName); 
+                }
+                console.log(`✅ Remote stream from ${targetSocketId} received/updated.`);
             };
 
             // --- Event 2: ICE Candidate Exchange ---
@@ -385,6 +412,34 @@
             return peer;
         }
 
+        /**
+         * Replaces the old track with a new track for all peer connections.
+         * Used for switching between camera and screen share.
+         * @param {MediaStreamTrack} newTrack - The track to switch to (video or screen).
+         * @param {string} kind - 'video' or 'audio'.
+         */
+        function replaceTrack(newTrack, kind) {
+            Object.values(peers).forEach(peer => {
+                // Find the sender for the specific track kind
+                const sender = peer.getSenders().find(s => s.track && s.track.kind === kind);
+                
+                if (sender) {
+                    sender.replaceTrack(newTrack)
+                        .then(() => console.log(`Track replaced successfully for peer: ${peer}`))
+                        .catch(err => console.error(`Error replacing ${kind} track:`, err));
+                } else {
+                    // Fallback: If no sender, it means no track was added initially, so add it now.
+                    // This is less common but good for robustness.
+                    if (newTrack) {
+                        peer.addTrack(newTrack, newTrack.kind === 'video' ? (screenShareStream || localStream) : localStream);
+                        // For a clean switch, a new offer/answer negotiation might be needed here, 
+                        // but replaceTrack is usually enough for WebRTC to handle.
+                    }
+                }
+            });
+        }
+
+
         // Main function to start media and join the room
         async function startMedia(meetingId, name, email) {
             if (!meetingId || !name || !email) {
@@ -393,7 +448,9 @@
             try {
                 // 1. Get local media (camera and microphone)
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                addVideoStream(myVideo, localStream, name + ' (You)'); // UPDATED CALL
+                originalVideoTrack = localStream.getVideoTracks()[0]; // Store original camera track
+
+                addVideoStream(myVideo, localStream, name + ' (You)'); 
 
                 // 2. Inform server that this user has joined and is ready
                 socket.emit('join-room', { meetingId, name, email });
@@ -409,7 +466,7 @@
         }
         
         // ----------------------------------------------------
-        // UI and Controls Logic (UPDATED)
+        // UI and Controls Logic (IMPROVED)
         // ----------------------------------------------------
         const participantsList = document.getElementById('participants');
         const toggleAudioBtn = document.getElementById('toggle-audio-btn');
@@ -423,6 +480,13 @@
         const screenshareIcon = document.getElementById('screenshare-icon');
         const screenshareLabel = document.getElementById('screenshare-label');
         
+        // Helper function to update control button UI state
+        function updateControlButton(btn, iconEl, labelEl, state, activeIcon, inactiveIcon, activeLabel, inactiveLabel) {
+            btn.setAttribute('aria-pressed', state);
+            iconEl.className = state ? `${activeIcon} icon` : `${inactiveIcon} icon`;
+            labelEl.textContent = state ? activeLabel : inactiveLabel;
+        }
+
         // UI: Renders the participant list
         function renderParticipants(){
             participantsList.innerHTML='';
@@ -433,7 +497,7 @@
             });
         }
 
-        // UI: Toggle Audio (UPDATED)
+        // UI: Toggle Audio
         toggleAudioBtn.addEventListener('click', ()=>{
             if(!localStream) return;
             const track = localStream.getAudioTracks()[0];
@@ -442,12 +506,19 @@
             track.enabled = !track.enabled;
             const isEnabled = track.enabled;
             
-            toggleAudioBtn.setAttribute('aria-pressed', isEnabled);
-            audioIcon.className = isEnabled ? 'fas fa-microphone icon' : 'fas fa-microphone-slash icon';
-            audioLabel.textContent = isEnabled ? 'Mute':'Unmute';
+            updateControlButton(
+                toggleAudioBtn, 
+                audioIcon, 
+                audioLabel, 
+                isEnabled, 
+                'fas fa-microphone', 
+                'fas fa-microphone-slash', 
+                'Mute', 
+                'Unmute'
+            );
         });
 
-        // UI: Toggle Video (UPDATED)
+        // UI: Toggle Video
         toggleVideoBtn.addEventListener('click', ()=>{
             if(!localStream) return;
             const track = localStream.getVideoTracks()[0];
@@ -456,45 +527,95 @@
             track.enabled = !track.enabled;
             const isEnabled = track.enabled;
             
-            toggleVideoBtn.setAttribute('aria-pressed', isEnabled);
-            videoIcon.className = isEnabled ? 'fas fa-video icon':'fas fa-video-slash icon';
-            videoLabel.textContent = isEnabled ? 'Stop':'Start';
+            updateControlButton(
+                toggleVideoBtn, 
+                videoIcon, 
+                videoLabel, 
+                isEnabled, 
+                'fas fa-video', 
+                'fas fa-video-slash', 
+                'Stop', 
+                'Start'
+            );
         });
 
-        // UI: Toggle Screen Share
+        // UI: Toggle Screen Share (IMPROVED LOGIC)
         toggleScreenShareBtn.addEventListener('click', async ()=>{
             if(!localStream) return alert('Start camera/mic first.');
+            
+            const isScreenSharing = screenShareStream !== null;
 
-            if(screenShareStream){
-                // Stop screen share
+            if(isScreenSharing){
+                // ------------------ STOP SCREEN SHARE ------------------
                 screenShareStream.getTracks().forEach(t=>t.stop());
                 screenShareStream = null;
                 
-                // Switch back to camera stream and tell peers to switch
-                // NOTE: Proper track switching requires a loop through all peers and peer.getSenders()
-                // For simplicity here, we only switch the local display.
+                // 1. Switch local video back to camera stream
                 myVideo.srcObject = localStream;
-                screenshareIcon.className='fas fa-desktop icon';
-                screenshareLabel.textContent='Share';
+                
+                // 2. Replace the screen share track with the original camera video track for all peers
+                replaceTrack(originalVideoTrack, 'video');
+
+                // 3. Re-enable video button (if it was disabled)
                 toggleVideoBtn.disabled=false;
+                
+                // 4. Update UI
+                updateControlButton(
+                    toggleScreenShareBtn, 
+                    screenshareIcon, 
+                    screenshareLabel, 
+                    false, 
+                    'fas fa-stop-circle', // Active Icon
+                    'fas fa-desktop', // Inactive Icon
+                    'Stop', 
+                    'Share'
+                );
+
             } else {
-                // Start screen share
+                // ------------------ START SCREEN SHARE ------------------
                 try{
-                    screenShareStream = await navigator.mediaDevices.getDisplayMedia({video:true});
+                    // Get display media, request video, but NOT audio (we keep the existing camera audio)
+                    screenShareStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: true,
+                        audio: false // We use the audio from localStream
+                    });
+                    
+                    const screenVideoTrack = screenShareStream.getVideoTracks()[0];
                     
                     // Stop screen share if user clicks 'Stop Sharing' button in the browser UI
-                    screenShareStream.getVideoTracks()[0].onended = () => {
-                        toggleScreenShareBtn.click(); // Re-trigger the click to reset
+                    screenVideoTrack.onended = () => {
+                        // This timeout ensures the toggle logic runs *after* any internal browser teardown
+                        setTimeout(() => toggleScreenShareBtn.click(), 100); 
                     };
 
-                    // Switch to screen share stream on local display
+                    // 1. Switch local video display to screen share stream
                     myVideo.srcObject = screenShareStream;
-                    screenshareIcon.className='fas fa-stop-circle icon';
-                    screenshareLabel.textContent='Stop';
+                    
+                    // 2. Replace the camera video track with the screen video track for all peers
+                    replaceTrack(screenVideoTrack, 'video');
+                    
+                    // 3. Disable the video toggle button (as it's now screen sharing)
                     toggleVideoBtn.disabled=true;
-                    // NOTE: Real track switching logic would go here: 
-                    // loop through peers and replaceTrack(oldVideoTrack, newScreenTrack)
-                }catch(err){console.error(err); alert('Cannot share screen');}
+                    
+                    // 4. Update UI
+                    updateControlButton(
+                        toggleScreenShareBtn, 
+                        screenshareIcon, 
+                        screenshareLabel, 
+                        true, 
+                        'fas fa-stop-circle', // Active Icon
+                        'fas fa-desktop', // Inactive Icon
+                        'Stop', 
+                        'Share'
+                    );
+
+                }catch(err){
+                    console.error('Error starting screen share:', err);
+                    alert('Cannot share screen. Permissions denied or operation cancelled.');
+                    // Ensure state is clean if it fails
+                    screenShareStream = null; 
+                    toggleScreenShareBtn.setAttribute('aria-pressed', false);
+                }
             }
         });
 
@@ -505,6 +626,9 @@
             
             // Close all peer connections
             Object.values(peers).forEach(p => p.close());
+
+            // Signal server to leave
+            socket.emit('leave-room', meetingId); 
 
             // Redirect back to index/home page
             window.location.href='index.html';
@@ -600,7 +724,7 @@
             }
         });
 
-        // F. USER DISCONNECTED (UPDATED)
+        // F. USER DISCONNECTED
         socket.on('user-disconnected', ({ socketId }) => {
             if (peers[socketId]) {
                 peers[socketId].close(); 
@@ -624,7 +748,8 @@
             startMedia(meetingId, name, email);
         } else {
             alert('Missing meeting details. Redirecting to home.');
-            window.location.href = '/';
+            // Assuming your home page is just '/'
+            window.location.href = '/'; 
         }
 
     </script>
