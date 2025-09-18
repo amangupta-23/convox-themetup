@@ -186,6 +186,7 @@
                     <p class="testimonial-text">"A truly seamless platform. The security features give us peace of mind for every confidential discussion."</p>
                     <div class="client-info">
                         <span class="client-name">Rohan Gupta</span>
+                        <span class="client-title">CTO, Secure Systems</span>
                     </div>
                 </div>
             </div>
@@ -314,6 +315,7 @@
     </div>
     <div class="footer-bottom">
       <p>&copy; 2025 Convox Meeting. All rights reserved.</p>
+      <p>CTO, Secure Systems</p>
     </div>
   </footer>
 
@@ -321,7 +323,7 @@
   <script>
     AOS.init();
 
-    // Dropdown Toggle
+    // Dropdown Toggle (Unchanged)
     document.querySelector('.dropdown-toggle').addEventListener('click', () => {
       document.querySelector('.dropdown-container').classList.toggle('show');
     });
@@ -331,11 +333,10 @@
       if (dropdown.classList.contains('show') && !dropdown.contains(e.target)) dropdown.classList.remove('show');
     });
 
-    // ⭐⭐⭐ YAHAN BADLAV KIYA GAYA HAI ⭐⭐⭐
-    // Render server ka pura URL define kiya gaya hai.
+    // Render server ka pura URL define kiya gaya hai. (Unchanged - Correct)
     const RENDER_BACKEND_URL = 'https://convox-themetup.onrender.com';
 
-    // Join Meeting Form
+    // Join Meeting Form (Error handling improved)
     document.getElementById('joinMeetingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const userName = document.getElementById('userNameInput').value.trim();
@@ -347,7 +348,6 @@
       }
 
       try {
-        // API call me pura URL use kiya gaya hai.
         const response = await fetch(`${RENDER_BACKEND_URL}/join-meeting`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -356,24 +356,32 @@
         if (response.ok) {
           localStorage.setItem('userName', userName);
           localStorage.setItem('userEmail', userEmail);
-          // NOTE: Make sure 'meeting.html' exists on Netlify.
           window.location.href = `/meeting.html?id=${meetingId}`; 
         } else {
-          const errorData = await response.json();
-          alert('Error: ' + errorData.error);
+          // Server se aaya hua specific error dikhaao
+          const errorData = await response.json().catch(() => ({ error: `Status ${response.status}: Unknown server error.` }));
+          alert('Error joining meeting: ' + errorData.error);
         }
       } catch (err) {
-        alert('Network error. Could not connect to server.');
+        // Network ya CORS error ko clearly bataao
+        console.error("Join Meeting Error:", err);
+        alert('Network/Server Error: Could not connect to the Render backend. Please check if the Render server is active.');
       }
     });
 
-    // Create Meeting Button
+    // Create Meeting Button (Error handling improved)
     const createBtn = document.getElementById('createMeetingBtn');
     createBtn.addEventListener('click', async () => {
       try {
-        // API call me pura URL use kiya gaya hai.
         const res = await fetch(`${RENDER_BACKEND_URL}/create-meeting`);
+        
+        if (!res.ok) {
+          // Non-200 status code (e.g., 500 server error)
+          throw new Error(`Server responded with status ${res.status}`);
+        }
+
         const data = await res.json();
+        
         if (data.meetingId) {
           document.getElementById('meetingIdInput').value = data.meetingId;
           const link = `${window.location.origin}/?meetingId=${data.meetingId}`;
@@ -386,9 +394,13 @@
           document.execCommand('copy');
           document.body.removeChild(tempInput);
           alert(`Meeting Created!\nID: ${data.meetingId}\nLink copied to clipboard.`);
+        } else {
+          // Agar response OK hai par meetingId nahi hai (unexpected server response)
+          throw new Error('Server response was missing meeting ID.');
         }
       } catch (err) {
-        alert('Error creating meeting. Server might be down or inaccessible.');
+        console.error("Create Meeting Error:", err);
+        alert(`Error creating meeting. Render server might be down or inaccessible. Details: ${err.message}`);
       }
     });
 
