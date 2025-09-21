@@ -1,15 +1,13 @@
-// Saari zaroori Node.js libraries ko import karein
-import express from 'express'; // Web server framework
-import mongoose from 'mongoose'; // MongoDB se connect karne ke liye
-import { createServer } from 'http'; // HTTP server banane ke liye
-import { Server } from 'socket.io'; // Real-time communication ke liye
-import cors from 'cors'; // Cross-Origin Resource Sharing ko handle karne ke liye
-import dotenv from 'dotenv'; // Environment variables (.env file se) load karne ke liye
-import { v4 as uuidv4 } from 'uuid'; // Unique meeting ID banane ke liye
-import path from 'path'; // File paths ko handle karne ke liye
-import { fileURLToPath } from 'url'; // ESM modules mein __dirname aur __filename ko define karne ke liye
+import express from 'express';
+import mongoose from 'mongoose';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { v4 as uuidv4 } from 'uuid';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// `__dirname` aur `__filename` ko setup karein
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -17,18 +15,15 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
-
-// --- CORS Configuration (Express App) ---
-// Sirf Netlify site se aane wali requests ko allow karein.
-// Aapki Netlify site ka URL yahaan par daalein.
-const NETLIFY_ORIGIN = 'https://convoxthemeetup.netlify.app';
+// CORRECTED: Changed the Netlify origin to match the screenshot
+const NETLIFY_ORIGIN = 'https://convox-themetup.netlify.app'; 
 
 const corsOptions = {
     origin: NETLIFY_ORIGIN
 };
 
 // Netlify site ko requests bhejney ki anumati dega
-app.use(cors(corsOptions)); 
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB Connection & Schema
@@ -57,9 +52,7 @@ const meetingSchema = new Schema({
 
 const Meeting = model('Meeting', meetingSchema);
 
-// --- Socket.IO Server Setup ---
 const server = createServer(app);
-// Socket.IO ke liye bhi CORS configure karein
 const io = new Server(server, {
     cors: {
         origin: NETLIFY_ORIGIN,
