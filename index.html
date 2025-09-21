@@ -1,413 +1,406 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Convox Elite - Virtual Meeting Solutions</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="index.css">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a7b1b11b13.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convox Elite - Virtual Meeting Solutions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a7b1b11b13.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <header class="navbar">
-    <div class="logo">
-      <img src="logo.jpg" alt="Convox Logo">
-    </div>
-    <nav aria-label="Main Navigation">
-      <ul id="nav-menu">
-        <li><a href="#hero" class="active">Home</a></li>
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="#team-chat">Team Chat</a></li>
-        <li><a href="#the-best">App</a></li>
-        <li><a href="#services">Features</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
+  <!-- ================== Navbar ================== -->
+  <header class="navbar">
+    <div class="logo">
+      <img src="logo.jpg" alt="Convox Logo">
+    </div>
+    <nav aria-label="Main Navigation">
+      <ul id="nav-menu">
+        <li><a href="#hero" class="active">Home</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#team-chat">Team Chat</a></li>
+        <li><a href="#the-best">App</a></li>
+        <li><a href="#services">Features</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
 
-        <button id="createMeetingBtn" class="btn-primary" style="margin-left:15px;">
-      Create Meeting
-    </button>
+    <!-- Create Meeting Button -->
+    <button id="createMeetingBtn" class="btn-primary" style="margin-left:15px;">
+      Create Meeting
+    </button>
 
-        <div class="dropdown-container">
-      <button class="btn-navbar dropdown-toggle">Join Meeting</button>
-      <div class="dropdown-content">
-        <form id="joinMeetingForm">
-          <input type="text" id="userNameInput" placeholder="Your Name" required>
-          <input type="email" id="userEmailInput" placeholder="Your Email" required>
-          <input type="text" id="meetingIdInput" placeholder="Enter Meeting ID" required>
-          <button type="submit" class="btn-primary">Join</button>
-        </form>
-        </div>
-    </div>
-  </header>
+    <!-- Join Meeting Dropdown -->
+    <div class="dropdown-container">
+      <button class="btn-navbar dropdown-toggle">Join Meeting</button>
+      <div class="dropdown-content">
+        <form id="joinMeetingForm">
+          <input type="text" id="userNameInput" placeholder="Your Name" required>
+          <input type="email" id="userEmailInput" placeholder="Your Email" required>
+          <input type="text" id="meetingIdInput" placeholder="Enter Meeting ID" required>
+          <button type="submit" class="btn-primary">Join</button>
+        </form>
+      </div>
+    </div>
+  </header>
 
-    <main>
-        <section id="hero" class="hero">
-      <div class="hero-content">
-        <h1 class="hero-title" data-aos="fade-up" data-aos-duration="1000">
-          Elite Virtual Conferences for Modern Business
-        </h1>
-        <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
-          Our team deserves a professional and seamless virtual conference experience, crafted for success.
-        </p>
-        <a href="#meeting-features" class="btn-primary" data-aos="fade-up" data-aos-delay="400" data-aos-duration="1000">
-          Explore Features
-        </a>
-      </div>
-    </section>
+  <!-- ================== Main ================== -->
+  <main>
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+      <div class="hero-content">
+        <h1 class="hero-title" data-aos="fade-up" data-aos-duration="1000">
+          Elite Virtual Conferences for Modern Business
+        </h1>
+        <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
+          Our team deserves a professional and seamless virtual conference experience, crafted for success.
+        </p>
+        <a href="#meeting-features" class="btn-primary" data-aos="fade-up" data-aos-delay="400" data-aos-duration="1000">
+          Explore Features
+        </a>
+      </div>
+    </section>
 
-        <section id="meeting-features" class="section-padded">
-      <div class="container">
-        <h2 class="section-title" data-aos="fade-up">Core Meeting Features</h2>
-        <div class="features-grid">
-          <div class="feature-card" data-aos="zoom-in" data-aos-delay="100">
-            <i class="fas fa-video feature-icon"></i>
-            <h3>High-Definition Video</h3>
-            <p>Experience crystal-clear video quality for every participant.</p>
-          </div>
-          <div class="feature-card" data-aos="zoom-in" data-aos-delay="200">
-            <i class="fas fa-microphone feature-icon"></i>
-            <h3>Clear Audio</h3>
-            <p>Noise-cancelling audio ensures perfect clarity.</p>
-          </div>
-          <div class="feature-card" data-aos="zoom-in" data-aos-delay="300">
-            <i class="fas fa-desktop feature-icon"></i>
-            <h3>Screen Sharing</h3>
-            <p>Share presentations and collaborate seamlessly.</p>
-          </div>
-          <div class="feature-card" data-aos="zoom-in" data-aos-delay="400">
-            <i class="fas fa-comment-dots feature-icon"></i>
-            <h3>In-Meeting Chat</h3>
-            <p>Communicate privately or with the whole group.</p>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- Meeting Features Section -->
+    <section id="meeting-features" class="section-padded">
+      <div class="container">
+        <h2 class="section-title" data-aos="fade-up">Core Meeting Features</h2>
+        <div class="features-grid">
+          <div class="feature-card" data-aos="zoom-in" data-aos-delay="100">
+            <i class="fas fa-video feature-icon"></i>
+            <h3>High-Definition Video</h3>
+            <p>Experience crystal-clear video quality for every participant.</p>
+          </div>
+          <div class="feature-card" data-aos="zoom-in" data-aos-delay="200">
+            <i class="fas fa-microphone feature-icon"></i>
+            <h3>Clear Audio</h3>
+            <p>Noise-cancelling audio ensures perfect clarity.</p>
+          </div>
+          <div class="feature-card" data-aos="zoom-in" data-aos-delay="300">
+            <i class="fas fa-desktop feature-icon"></i>
+            <h3>Screen Sharing</h3>
+            <p>Share presentations and collaborate seamlessly.</p>
+          </div>
+          <div class="feature-card" data-aos="zoom-in" data-aos-delay="400">
+            <i class="fas fa-comment-dots feature-icon"></i>
+            <h3>In-Meeting Chat</h3>
+            <p>Communicate privately or with the whole group.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <section id="how-it-works" class="section-padded">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Seamless Integration, Simple Steps</h2>
-            <div class="steps-grid">
-                <div class="step-card" data-aos="fade-up">
-                    <img src="ok.jpg" alt="Create Meeting" class="step-image">
-                    <h4 class="card-title">Initiate a Meeting</h4>
-                    <p class="card-description">Create a secure meeting room in a single click and share for instant collaboration.</p>
-                </div>
-                <div class="step-card" data-aos="fade-up" data-aos-delay="100">
-                    <img src="joon.jpg" alt="Join Meeting" class="step-image">
-                    <h4 class="card-title">Join from Any Device</h4>
-                    <p class="card-description">No downloads needed. Access meetings seamlessly on web and mobile devices.</p>
-                </div>
-                <div class="step-card" data-aos="fade-up" data-aos-delay="200">
-                    <img src="co.jpg" alt="Collaborate" class="step-image">
-                    <h4 class="card-title">Collaborate in Real-Time</h4>
-                    <p class="card-description">Experience high-quality video, audio, and screen sharing for a luxurious experience.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <section id="how-it-works" class="section-padded">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Seamless Integration, Simple Steps</h2>
+            <div class="steps-grid">
+                <div class="step-card" data-aos="fade-up">
+                    <img src="ok.jpg" alt="Create Meeting" class="step-image">
+                    <h4 class="card-title">Initiate a Meeting</h4>
+                    <p class="card-description">Create a secure meeting room in a single click and share for instant collaboration.</p>
+                </div>
+                <div class="step-card" data-aos="fade-up" data-aos-delay="100">
+                    <img src="joon.jpg" alt="Join Meeting" class="step-image">
+                    <h4 class="card-title">Join from Any Device</h4>
+                    <p class="card-description">No downloads needed. Access meetings seamlessly on web and mobile devices.</p>
+                </div>
+                <div class="step-card" data-aos="fade-up" data-aos-delay="200">
+                    <img src="co.jpg" alt="Collaborate" class="step-image">
+                    <h4 class="card-title">Collaborate in Real-Time</h4>
+                    <p class="card-description">Experience high-quality video, audio, and screen sharing for a luxurious experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <section id="team-chat" class="section-padded">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Integrated Team Chat</h2>
-            <div class="chat-grid">
-                <div class="chat-card" data-aos="fade-left">
-                    <img src="download (1).jpeg" alt="Instant messaging" class="chat-image">
-                    <div class="chat-details">
-                        <h4 class="card-title">Instant Messaging</h4>
-                        <p class="card-description">Private, secure, and powerful communication tailored for your team.</p>
-                    </div>
-                </div>
-                <div class="chat-card" data-aos="fade-left" data-aos-delay="100">
-                    <img src="download.jpeg" alt="File sharing" class="chat-image">
-                    <div class="chat-details">
-                        <h4 class="card-title">Effortless File Sharing</h4>
-                        <p class="card-description">Share anything, at any time, with a beautifully organized interface.</p>
-                    </div>
-                </div>
-                <div class="chat-card" data-aos="fade-left" data-aos-delay="200">
-                    <img src="images (1).jpeg" alt="Threaded conversations" class="chat-image">
-                    <div class="chat-details">
-                        <h4 class="card-title">Organized Threads</h4>
-                        <p class="card-description">Never lose important notes or conversations. Every chat is impeccably organized.</p>
-                    </div>
-                </div>
-                <div class="chat-card" data-aos="fade-left" data-aos-delay="300">
-                    <img src="images.jpeg" alt="Secure chat" class="chat-image">
-                    <div class="chat-details">
-                        <h4 class="card-title">End-to-End Encryption</h4>
-                        <p class="card-description">Your data, your privacy. Always protected with robust security protocols.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <section id="team-chat" class="section-padded">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Integrated Team Chat</h2>
+            <div class="chat-grid">
+                <div class="chat-card" data-aos="fade-left">
+                    <img src="download (1).jpeg" alt="Instant messaging" class="chat-image">
+                    <div class="chat-details">
+                        <h4 class="card-title">Instant Messaging</h4>
+                        <p class="card-description">Private, secure, and powerful communication tailored for your team.</p>
+                    </div>
+                </div>
+                <div class="chat-card" data-aos="fade-left" data-aos-delay="100">
+                    <img src="download.jpeg" alt="File sharing" class="chat-image">
+                    <div class="chat-details">
+                        <h4 class="card-title">Effortless File Sharing</h4>
+                        <p class="card-description">Share anything, at any time, with a beautifully organized interface.</p>
+                    </div>
+                </div>
+                <div class="chat-card" data-aos="fade-left" data-aos-delay="200">
+                    <img src="images (1).jpeg" alt="Threaded conversations" class="chat-image">
+                    <div class="chat-details">
+                        <h4 class="card-title">Organized Threads</h4>
+                        <p class="card-description">Never lose important notes or conversations. Every chat is impeccably organized.</p>
+                    </div>
+                </div>
+                <div class="chat-card" data-aos="fade-left" data-aos-delay="300">
+                    <img src="images.jpeg" alt="Secure chat" class="chat-image">
+                    <div class="chat-details">
+                        <h4 class="card-title">End-to-End Encryption</h4>
+                        <p class="card-description">Your data, your privacy. Always protected with robust security protocols.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <section id="the-best" class="section-padded">
-        <div class="container feature-flex-card" data-aos="fade-right">
-            <div class="feature-image-container">
-                <img src="success.jpg" alt="Professional team meeting" class="feature-image">
-            </div>
-            <div class="feature-text-container">
-                <h2 class="section-title">The Industry's Most Trusted Platform</h2>
-                <p class="large-paragraph">CONNECT WITH YOUR TEAM, ANYTIME, ANYWHERE.</p>
-                <ul class="feature-list">
-                    <li><span>✅</span> Trusted by thousands of leading companies, worldwide</li>
-                    <li><span>🎥</span> HD video and crystal-clear audio conferencing</li>
-                    <li><span>🤝</span> Integrated team chat, file-sharing, and screen sharing</li>
-                    <li><span>🔒</span> Full-scale encryption for unparalleled privacy</li>
-                    <li><span>📱</span> Seamlessly accessible on desktop, mobile, and tablet</li>
-                </ul>
-                <a href="#contact" class="btn-primary">Request a Demo</a>
-            </div>
-        </div>
-    </section>
-    
-    <section id="testimonials" class="section-padded">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">What Our Clients Say</h2>
-            <div class="testimonials-grid">
-                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
-                    <p class="testimonial-text">"Convox has completely transformed our team collaboration. The clarity and reliability are unmatched!"</p>
-                    <div class="client-info">
-                        <span class="client-name">Ankit Kumar</span>
-                        <span class="client-title">CEO, Tech Innovators</span>
-                    </div>
-                </div>
-                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
-                    <p class="testimonial-text">"The integrated chat and file sharing are a game-changer. Our meetings are now more productive than ever."</p>
-                    <div class="client-info">
-                        <span class="client-name">Priya Sharma</span>
-                        <span class="client-title">Project Manager, Digital Solutions</span>
-                    </div>
-                </div>
-                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
-                    <p class="testimonial-text">"A truly seamless platform. The security features give us peace of mind for every confidential discussion."</p>
-                    <div class="client-info">
-                        <span class="client-name">Rohan Gupta</span>
-                        <span class="client-title">CTO, Secure Systems</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <section id="the-best" class="section-padded">
+        <div class="container feature-flex-card" data-aos="fade-right">
+            <div class="feature-image-container">
+                <img src="success.jpg" alt="Professional team meeting" class="feature-image">
+            </div>
+            <div class="feature-text-container">
+                <h2 class="section-title">The Industry's Most Trusted Platform</h2>
+                <p class="large-paragraph">CONNECT WITH YOUR TEAM, ANYTIME, ANYWHERE.</p>
+                <ul class="feature-list">
+                    <li><span>✅</span> Trusted by thousands of leading companies, worldwide</li>
+                    <li><span>🎥</span> HD video and crystal-clear audio conferencing</li>
+                    <li><span>🤝</span> Integrated team chat, file-sharing, and screen sharing</li>
+                    <li><span>🔒</span> Full-scale encryption for unparalleled privacy</li>
+                    <li><span>📱</span> Seamlessly accessible on desktop, mobile, and tablet</li>
+                </ul>
+                <a href="#contact" class="btn-primary">Request a Demo</a>
+            </div>
+        </div>
+    </section>
+    
+    <section id="testimonials" class="section-padded">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">What Our Clients Say</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+                    <p class="testimonial-text">"Convox has completely transformed our team collaboration. The clarity and reliability are unmatched!"</p>
+                    <div class="client-info">
+                        <span class="client-name">Ankit Kumar</span>
+                        <span class="client-title">CEO, Tech Innovators</span>
+                    </div>
+                </div>
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+                    <p class="testimonial-text">"The integrated chat and file sharing are a game-changer. Our meetings are now more productive than ever."</p>
+                    <div class="client-info">
+                        <span class="client-name">Priya Sharma</span>
+                        <span class="client-title">Project Manager, Digital Solutions</span>
+                    </div>
+                </div>
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
+                    <p class="testimonial-text">"A truly seamless platform. The security features give us peace of mind for every confidential discussion."</p>
+                    <div class="client-info">
+                        <span class="client-name">Rohan Gupta</span>
+                        <span class="client-title">Lead Developer, CodeCrafters</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <section id="faq" class="section-padded">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Frequently Asked Questions</h2>
-            <div class="faq-container" data-aos="fade-up">
-                <div class="faq-item">
-                    <button class="faq-question">
-                        Is Convox free to use?
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>Yes, Convox offers a free Basic Plan with all the essential features for personal and small team use.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question">
-                        Do I need to download any software?
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>No, Convox is entirely browser-based. You can join or host a meeting directly from your web browser without any downloads.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question">
-                        Is my meeting data secure?
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>Absolutely. All of our meetings and chats are protected with end-to-end encryption to ensure your data and privacy are always safe.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-question">
-                        Can I share my screen with a participant?
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <div class="faq-answer">
-                        <p>Yes, all of our plans include seamless screen sharing functionality, allowing you to present your work with ease.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <section id="faq" class="section-padded">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Frequently Asked Questions</h2>
+            <div class="faq-container" data-aos="fade-up">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Is Convox free to use?
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes, Convox offers a free Basic Plan with all the essential features for personal and small team use.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Do I need to download any software?
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>No, Convox is entirely browser-based. You can join or host a meeting directly from your web browser without any downloads.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Is my meeting data secure?
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Absolutely. All of our meetings and chats are protected with end-to-end encryption to ensure your data and privacy are always safe.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Can I share my screen with a participant?
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes, all of our plans include seamless screen sharing functionality, allowing you to present your work with ease.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <section id="services" class="section-padded">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Our Distinctive Features</h2>
-            <div class="services-grid">
-                <div class="service-card" data-aos="flip-up">
-                    <i class="fas fa-video service-icon"></i>
-                    <h3 class="service-title">HD Video Meetings</h3>
-                    <p class="service-description">Next-level clarity and precision for every professional conversation.</p>
-                </div>
-                <div class="service-card" data-aos="flip-up" data-aos-delay="100">
-                    <i class="fas fa-users service-icon"></i>
-                    <h3 class="service-title">Team Collaboration</h3>
-                    <p class="service-description">Smart chat, clean file sharing, and instant teamwork functionality.</p>
-                </div>
-                <div class="service-card" data-aos="flip-up" data-aos-delay="200">
-                    <i class="fas fa-share-square service-icon"></i>
-                    <h3 class="service-title">Screen Sharing</h3>
-                    <p class="service-description">Seamlessly present your work with effortless, instant screen sharing.</p>
-                </div>
-                <div class="service-card" data-aos="flip-up" data-aos-delay="300">
-                    <i class="fas fa-lock service-icon"></i>
-                    <h3 class="service-title">Robust Security</h3>
-                    <p class="service-description">Every meeting and chat is secured with end-to-end encryption.</p>
-                </div>
-                <div class="service-card" data-aos="flip-up" data-aos-delay="400">
-                    <i class="fas fa-calendar-alt service-icon"></i>
-                    <h3 class="service-title">Effortless Scheduling</h3>
-                    <p class="service-description">Plan and manage meetings efficiently, ensuring you never miss a moment.</p>
-                </div>
-                <div class="service-card" data-aos="flip-up" data-aos-delay="500">
-                    <i class="fas fa-mobile-alt service-icon"></i>
-                    <h3 class="service-title">Mobile Accessibility</h3>
-                    <p class="service-description">Access Convox on Android and iOS devices, anywhere, at any time.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <section id="services" class="section-padded">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Our Distinctive Features</h2>
+            <div class="services-grid">
+                <div class="service-card" data-aos="flip-up">
+                    <i class="fas fa-video service-icon"></i>
+                    <h3 class="service-title">HD Video Meetings</h3>
+                    <p class="service-description">Next-level clarity and precision for every professional conversation.</p>
+                </div>
+                <div class="service-card" data-aos="flip-up" data-aos-delay="100">
+                    <i class="fas fa-users service-icon"></i>
+                    <h3 class="service-title">Team Collaboration</h3>
+                    <p class="service-description">Smart chat, clean file sharing, and instant teamwork functionality.</p>
+                </div>
+                <div class="service-card" data-aos="flip-up" data-aos-delay="200">
+                    <i class="fas fa-share-square service-icon"></i>
+                    <h3 class="service-title">Screen Sharing</h3>
+                    <p class="service-description">Seamlessly present your work with effortless, instant screen sharing.</p>
+                </div>
+                <div class="service-card" data-aos="flip-up" data-aos-delay="300">
+                    <i class="fas fa-lock service-icon"></i>
+                    <h3 class="service-title">Robust Security</h3>
+                    <p class="service-description">Every meeting and chat is secured with end-to-end encryption.</p>
+                </div>
+                <div class="service-card" data-aos="flip-up" data-aos-delay="400">
+                    <i class="fas fa-calendar-alt service-icon"></i>
+                    <h3 class="service-title">Effortless Scheduling</h3>
+                    <p class="service-description">Plan and manage meetings efficiently, ensuring you never miss a moment.</p>
+                </div>
+                <div class="service-card" data-aos="flip-up" data-aos-delay="500">
+                    <i class="fas fa-mobile-alt service-icon"></i>
+                    <h3 class="service-title">Mobile Accessibility</h3>
+                    <p class="service-description">Access Convox on Android and iOS devices, anywhere, at any time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <section id="contact" class="section-padded">
-      <div class="container contact-container">
-        <h2 class="section-title" data-aos="fade-up">Connect With Us</h2>
-        <div class="form-card" data-aos="zoom-in">
-          <h3 class="card-title">Send Us a Message</h3>
-          <form method="POST" action="/contact">
-            <input type="text" name="name" placeholder="Your full name" required>
-            <input type="email" name="email" placeholder="Your email address" required>
-            <input type="text" name="subject" placeholder="Subject">
-            <textarea name="message" placeholder="Write your message here..." required></textarea>
-            <button type="submit" class="btn-primary">Send Message</button>
-          </form>
-        </div>
-      </div>
-    </section>
-  </main>
+    <!-- Contact Section -->
+    <section id="contact" class="section-padded">
+      <div class="container contact-container">
+        <h2 class="section-title" data-aos="fade-up">Connect With Us</h2>
+        <div class="form-card" data-aos="zoom-in">
+          <h3 class="card-title">Send Us a Message</h3>
+        <form name="contact" method="POST" data-netlify="true">            
+            <input type="text" name="name" placeholder="Your full name" required>
+            <input type="email" name="email" placeholder="Your email address" required>
+            <input type="text" name="subject" placeholder="Subject">
+            <textarea name="message" placeholder="Write your message here..." required></textarea>
+            <button type="submit">SEND MESSAGE</button>          
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
 
-    <footer>
-    <div class="container footer-content">
-      <div class="footer-section">
-        <img src="logo.jpg" alt="Convox Logo" style="width:120px;">
-        <p>Elite solutions for your virtual meetings.</p>
-      </div>
-      <div class="footer-section">
-        <h3>Contact</h3>
-        <p>Email: <a href="mailto:patwalmohit74@gmail.com">patwalmohit74@gmail.com</a></p>
-        <p>Phone: <a href="tel:+919319069373">+91-9319069373</a></p>
-      </div>
-      <div class="footer-section">
-        <h3>Follow Us</h3>
-        <div class="social-icons">
-          <a href="#"><i class="fab fa-facebook-f"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-linkedin-in"></i></a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2025 Convox Meeting. All rights reserved.</p>
-      <p>CTO, Secure Systems</p>
-    </div>
-  </footer>
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <div class="footer-section">
+        <img src="logo.jpg" alt="Convox Logo" style="width:120px;">
+        <p>Elite solutions for your virtual meetings.</p>
+      </div>
+      <div class="footer-section">
+        <h3>Contact</h3>
+        <p>Email: <a href="mailto:patwalmohit74@gmail.com">patwalmohit74@gmail.com</a></p>
+        <p>Phone: <a href="tel:+919319069373">+91-9319069373</a></p>
+      </div>
+      <div class="footer-section">
+        <h3>Follow Us</h3>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Convox Meeting. All rights reserved.</p>
+    </div>
+  </footer>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    AOS.init();
+  <!-- ================== Scripts ================== -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
 
-    // Dropdown Toggle (Unchanged)
-    document.querySelector('.dropdown-toggle').addEventListener('click', () => {
-      document.querySelector('.dropdown-container').classList.toggle('show');
-    });
+    // Dropdown Toggle
+    document.querySelector('.dropdown-toggle').addEventListener('click', () => {
+      document.querySelector('.dropdown-container').classList.toggle('show');
+    });
 
-    window.addEventListener('click', (e) => {
-      const dropdown = document.querySelector('.dropdown-container');
-      if (dropdown.classList.contains('show') && !dropdown.contains(e.target)) dropdown.classList.remove('show');
-    });
+    window.addEventListener('click', (e) => {
+      const dropdown = document.querySelector('.dropdown-container');
+      if (dropdown.classList.contains('show') && !dropdown.contains(e.target)) dropdown.classList.remove('show');
+    });
 
-    // Render server ka pura URL define kiya gaya hai. (Unchanged - Correct)
-    const RENDER_BACKEND_URL = 'https://convox-themetup.onrender.com';
+    // ** Corrected: Fetch URLs to point to your live Render server **
+    const RENDER_BACKEND_URL = 'https://convox-themetup.onrender.com';
 
-    // Join Meeting Form (Error handling improved)
-    document.getElementById('joinMeetingForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const userName = document.getElementById('userNameInput').value.trim();
-      const userEmail = document.getElementById('userEmailInput').value.trim();
-      const meetingId = document.getElementById('meetingIdInput').value.trim();
-      if (!userName || !userEmail || !meetingId) {
-        alert('Please fill all fields.');
-        return;
-      }
+    // Join Meeting Form
+    document.getElementById('joinMeetingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userName = document.getElementById('userNameInput').value.trim();
+      const userEmail = document.getElementById('userEmailInput').value.trim();
+      const meetingId = document.getElementById('meetingIdInput').value.trim();
+      if (!userName || !userEmail || !meetingId) {
+        alert('Please fill all fields.');
+        return;
+      }
 
-      try {
-        const response = await fetch(`${RENDER_BACKEND_URL}/join-meeting`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ meetingId }),
-        });
-        if (response.ok) {
-          localStorage.setItem('userName', userName);
-          localStorage.setItem('userEmail', userEmail);
-          window.location.href = `/meeting.html?id=${meetingId}`; 
-        } else {
-          // Server se aaya hua specific error dikhaao
-          const errorData = await response.json().catch(() => ({ error: `Status ${response.status}: Unknown server error.` }));
-          alert('Error joining meeting: ' + errorData.error);
-        }
-      } catch (err) {
-        // Network ya CORS error ko clearly bataao
-        console.error("Join Meeting Error:", err);
-        alert('Network/Server Error: Could not connect to the Render backend. Please check if the Render server is active.');
-      }
-    });
+      try {
+        const response = await fetch(`${RENDER_BACKEND_URL}/join-meeting`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ meetingId }),
+        });
+        if (response.ok) {
+          localStorage.setItem('userName', userName);
+          localStorage.setItem('userEmail', userEmail);
+          window.location.href = `/meeting.html?id=${meetingId}`;
+        } else {
+          const errorData = await response.json();
+          alert('Error: ' + errorData.error);
+        }
+      } catch (err) {
+        alert('Network error. Could not connect to server.');
+      }
+    });
 
-    // Create Meeting Button (Error handling improved)
-    const createBtn = document.getElementById('createMeetingBtn');
-    createBtn.addEventListener('click', async () => {
-      try {
-        const res = await fetch(`${RENDER_BACKEND_URL}/create-meeting`);
-        
-        if (!res.ok) {
-          // Non-200 status code (e.g., 500 server error)
-          throw new Error(`Server responded with status ${res.status}`);
-        }
+    // Create Meeting Button
+    const createBtn = document.getElementById('createMeetingBtn');
+    createBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch(`${RENDER_BACKEND_URL}/create-meeting`);
+        const data = await res.json();
+        if (data.meetingId) {
+          document.getElementById('meetingIdInput').value = data.meetingId;
+          const link = `${window.location.origin}/?meetingId=${data.meetingId}`;
+          // Corrected: Use execCommand for clipboard due to iframe restrictions
+          const tempInput = document.createElement('input');
+          document.body.appendChild(tempInput);
+          tempInput.value = link;
+          tempInput.select();
+          document.execCommand('copy');
+          document.body.removeChild(tempInput);
+          alert(`Meeting Created!\nID: ${data.meetingId}\nLink copied to clipboard.`);
+        }
+      } catch (err) {
+        alert('Error creating meeting.');
+      }
+    });
 
-        const data = await res.json();
-        
-        if (data.meetingId) {
-          document.getElementById('meetingIdInput').value = data.meetingId;
-          const link = `${window.location.origin}/?meetingId=${data.meetingId}`;
-          
-          // Clipboard copy logic (unchanged)
-          const tempInput = document.createElement('input');
-          document.body.appendChild(tempInput);
-          tempInput.value = link;
-          tempInput.select();
-          document.execCommand('copy');
-          document.body.removeChild(tempInput);
-          alert(`Meeting Created!\nID: ${data.meetingId}\nLink copied to clipboard.`);
-        } else {
-          // Agar response OK hai par meetingId nahi hai (unexpected server response)
-          throw new Error('Server response was missing meeting ID.');
-        }
-      } catch (err) {
-        console.error("Create Meeting Error:", err);
-        alert(`Error creating meeting. Render server might be down or inaccessible. Details: ${err.message}`);
-      }
-    });
-
-    // Auto-fill if meeting link has ?meetingId= in URL (unchanged)
-    const urlParams = new URLSearchParams(window.location.search);
-    const sharedMeetingId = urlParams.get('meetingId');
-    if (sharedMeetingId) document.getElementById('meetingIdInput').value = sharedMeetingId;
-  </script>
+    // Auto-fill if meeting link has ?meetingId= in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedMeetingId = urlParams.get('meetingId');
+    if (sharedMeetingId) document.getElementById('meetingIdInput').value = sharedMeetingId;
+  </script>
 </body>
 </html>
