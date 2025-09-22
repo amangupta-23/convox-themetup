@@ -307,14 +307,14 @@
         const RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
         const RTCIceCandidate = window.RTCIceCandidate || window.mozRTCIceCandidate || window.webkitRTCIceCandidate;
 
-        // FIX 2: Socket.IO को आपके Render URL से कनेक्ट करें
+        // Socket.IO को आपके Render URL से कनेक्ट करें
         const RENDER_BACKEND_URL = 'https://convox-themetup.onrender.com';
         const socket = io(RENDER_BACKEND_URL); 
 
         const videoGrid = document.getElementById('video-grid');
         const myVideo = document.createElement('video');
         myVideo.muted = true;
-        myVideo.id = 'my-video';
+        myVideo.id = 'my-video'; // Local video ID
         const peers = {}; // Key: remoteSocketId, Value: RTCPeerConnection object
 
         // Get Meeting and User Details
@@ -347,12 +347,27 @@
 
         // Function to display the video stream in the HTML with a container and name tag
         function addVideoStream(videoElement, stream, userName) {
+            // **⭐ FIX 1 (LOGIC IMPROVEMENT): Check and prevent adding duplicates**
+            // The video element's ID (which is 'my-video' for local, or 'video-remoteSocketId' for remote)
+            const videoId = videoElement.id;
+            const containerId = `container-${videoId}`;
+            
+            // Check if the container already exists in the DOM
+            const existingContainer = document.getElementById(containerId);
+            
+            if (existingContainer) {
+                // If container exists, just update the stream object (used for screen share/camera switch)
+                existingContainer.querySelector('.video-participant').srcObject = stream;
+                // Also update the name tag in case of reconnect/re-addition, though typically unnecessary.
+                const nameTagEl = existingContainer.querySelector('.name-tag');
+                if(nameTagEl) nameTagEl.textContent = userName;
+                return; // Exit the function to prevent adding a duplicate container
+            }
+
+            // --- If container does NOT exist, create it ---
             const videoContainer = document.createElement('div');
             videoContainer.classList.add('video-container');
-            
-            // FIX 3: Container ID को ठीक करें ताकि Disconnect लॉजिक सही से काम करे
-            const videoId = videoElement.id.startsWith('video-') ? videoElement.id.replace('video-', '') : videoElement.id;
-            videoContainer.id = `container-${videoId}`; 
+            videoContainer.id = containerId; 
 
             const nameTag = document.createElement('div');
             nameTag.classList.add('name-tag');
@@ -367,18 +382,17 @@
             videoContainer.append(videoElement);
             videoContainer.append(nameTag);
             
-            // Check if element already exists before appending
-            const existingContainer = document.getElementById(`container-${videoId}`);
-            if (!existingContainer) {
-                videoGrid.append(videoContainer);
-            } else {
-                // If container exists, replace the video element inside it (useful for stream changes)
-                existingContainer.querySelector('.video-participant').srcObject = stream;
-            }
+            videoGrid.append(videoContainer);
         }
 
         // Function to initialize the RTCPeerConnection
         function createPeerConnection(targetSocketId) {
+            // **⭐ FIX 2 (CRITICAL FIX): Don't create new Peer Connection if it already exists**
+            if (peers[targetSocketId]) {
+                console.warn(`Peer connection already exists for ${targetSocketId}. Returning existing one.`);
+                return peers[targetSocketId];
+            }
+            
             const peer = new RTCPeerConnection(configuration);
             peers[targetSocketId] = peer;
 
@@ -395,12 +409,20 @@
                 const remoteVideoId = `video-${targetSocketId}`;
                 let remoteVideo = document.getElementById(remoteVideoId);
 
-                // If video element already exists (e.g., from an earlier stream update), just update srcObject
+                // If stream is empty or has no tracks, don't proceed
+                if (!stream || stream.getTracks().length === 0) {
+                    console.warn(`Received empty stream or no tracks from ${targetSocketId}.`);
+                    return; 
+                }
+
+                // If video element already exists, just update srcObject (Fixes duplicate stream if track changes)
                 if (!remoteVideo) {
                     // Create new video element if it's the first time
                     remoteVideo = document.createElement('video');
                     remoteVideo.id = remoteVideoId;
                     remoteVideo.classList.add('remote-video');
+                    remoteVideo.muted = false; // Remote video should NOT be muted
+                    
                     const remoteUserName = participants[targetSocketId]?.name || 'Guest';
                     // We call addVideoStream to create the container
                     addVideoStream(remoteVideo, stream, remoteUserName); 
@@ -453,7 +475,7 @@
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 originalVideoTrack = localStream.getVideoTracks()[0]; // Store original camera track
 
-                // Use 'my-video' ID which is simple, without 'video-' prefix
+                // Add Local Video ONLY ONCE here.
                 addVideoStream(myVideo, localStream, name + ' (You)'); 
 
                 // 2. Inform server that this user has joined and is ready
@@ -490,6 +512,7 @@
         
         // Helper function to update control button UI state
         function updateControlButton(btn, iconEl, labelEl, state, activeIcon, inactiveIcon, activeLabel, inactiveLabel) {
+            // state is boolean: true=active/enabled, false=inactive/disabled
             btn.setAttribute('aria-pressed', state);
             iconEl.className = state ? `${activeIcon} icon` : `${inactiveIcon} icon`;
             labelEl.textContent = state ? activeLabel : inactiveLabel;
@@ -641,8 +664,6 @@
             window.location.href='index.html';
         });
         
-        // Note: Recording logic (startRecordingBtn) is not implemented.
-
         // ----------------------------------------------------
         // Socket.IO Signaling Handlers (The WebRTC Connection Logic)
         // ----------------------------------------------------
@@ -653,8 +674,13 @@
             
             existingParticipants.forEach(async (participant) => {
                 const targetSocketId = participant.socketId;
-                participants[targetSocketId] = participant; // Add to UI list
                 
+                // Add to participants list (if not already added by 'user-connected')
+                if (!participants[targetSocketId]) {
+                    participants[targetSocketId] = participant; 
+                }
+
+                // Call the improved function that checks for duplicates
                 const peer = createPeerConnection(targetSocketId);
 
                 try {
@@ -674,10 +700,14 @@
         socket.on('user-connected', (user) => {
             console.log(`👤 New user connected: ${user.name} (${user.socketId}). Preparing to receive call.`);
             
-            participants[user.socketId] = user; // Add to UI list
-            renderParticipants();
+            // Add/Update to participants list (Fixes participant list duplication)
+            if (!participants[user.socketId]) {
+                participants[user.socketId] = user; 
+                renderParticipants(); // Re-render only if truly new
+            }
             
             // Existing user naye user ke liye Peer Connection banayega.
+            // The improved function prevents duplicate creation.
             createPeerConnection(user.socketId);
         });
 
@@ -686,10 +716,8 @@
         socket.on('incoming-call', async ({ offer, from, fromName }) => {
             console.log(`Incoming call from: ${fromName} (${from})`);
             
-            let peer = peers[from]; 
-            if (!peer) {
-                peer = createPeerConnection(from);
-            }
+            // Call the improved function that checks for duplicates
+            let peer = createPeerConnection(from);
 
             try {
                 await peer.setRemoteDescription(new RTCSessionDescription(offer));
@@ -745,12 +773,7 @@
                 if (videoContainer) {
                     videoContainer.remove();
                 }
-                // Handle the local video container case (which has id 'container-my-video')
-                const localVideoContainer = document.getElementById('container-my-video');
-                 if(socketId === socket.id && localVideoContainer){
-                     localVideoContainer.remove();
-                 }
-
+                
                 console.log(`User ${socketId} disconnected. Video removed.`);
             }
         });
@@ -760,7 +783,7 @@
             startMedia(meetingId, name, email);
         } else {
             alert('Missing meeting details. Redirecting to home.');
-            window.location.href = '/'; 
+            window.location.href = 'index.html'; 
         }
 
     </script>
