@@ -15,23 +15,31 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
-// CORRECTED: Changed the Netlify origin to match the screenshot
+// Frontend URL (Netlify)
 const NETLIFY_ORIGIN = 'https://convox-themetup.netlify.app'; 
 
+// 🚨 महत्वपूर्ण सुधार 1: WebRTC के लिए ICE (STUN) सर्वर कॉन्फ़िगरेशन
+// ये सर्वर Peers को एक-दूसरे के पब्लिक IP address पता लगाने में मदद करते हैं।
+const ICE_SERVERS = [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:global.stun.twilio.com:3478' }
+    // अगर फिर भी ब्लैक स्क्रीन आए, तो TURN सर्वर की ज़रूरत पड़ेगी।
+];
+
 const corsOptions = {
-    origin: NETLIFY_ORIGIN
+    origin: NETLIFY_ORIGIN,
+    methods: ['GET', 'POST'],
+    credentials: true // अगर आप cookies/sessions इस्तेमाल कर रहे हैं तो ज़रूरी
 };
 
-// Netlify site ko requests bhejney ki anumati dega
+// Express के लिए CORS
 app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB Connection & Schema
 console.log('MONGO_URI from env:', process.env.MONGO_URI ? 'Set' : 'Not Set');
-// Environment variable se MongoDB URI lein, agar na mile to local URI use karein
 const MONGODB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/videocall';
 
-// MongoDB se connect karein
 mongoose
     .connect(MONGODB_URI)
     .then(() => console.log('✅ MongoDB connected!'))
@@ -39,9 +47,7 @@ mongoose
         console.error('❌ MongoDB connection error:', err.message);
     });
 
-// MongoDB schema for meetings
 const { Schema, model } = mongoose;
-
 const meetingSchema = new Schema({
     meetingId: { type: String, unique: true, required: true },
     createdAt: { type: Date, default: Date.now },
@@ -49,15 +55,12 @@ const meetingSchema = new Schema({
         { name: { type: String, required: true }, email: { type: String, required: true } },
     ],
 });
-
 const Meeting = model('Meeting', meetingSchema);
 
 const server = createServer(app);
+// Socket.IO के लिए CORS
 const io = new Server(server, {
-    cors: {
-        origin: NETLIFY_ORIGIN,
-        methods: ['GET', 'POST']
-    }
+    cors: corsOptions
 });
 
 // Global states to manage users and their connections
@@ -74,7 +77,8 @@ app.post('/create-meeting', async (req, res) => {
         await newMeeting.save();
         
         console.log(`New meeting created: ${meetingId}`);
-        return res.status(201).json({ meetingId }); 
+        // 🚨 सुधार 2: Frontend को ICE Servers की जानकारी भेजें
+        return res.status(201).json({ meetingId, iceServers: ICE_SERVERS }); 
         
     } catch (error) {
         console.error("Error creating meeting:", error);
@@ -88,7 +92,8 @@ app.post('/join-meeting', async (req, res) => {
     try {
         const meeting = await Meeting.findOne({ meetingId });
         if (meeting) {
-            return res.status(200).json({ success: true, message: 'Meeting found' });
+             // 🚨 सुधार 3: Frontend को ICE Servers की जानकारी भेजें
+            return res.status(200).json({ success: true, message: 'Meeting found', iceServers: ICE_SERVERS });
         } else {
             return res.status(404).json({ error: 'Meeting ID not found.' });
         }
@@ -136,16 +141,11 @@ io.on('connection', socket => {
             }
         });
 
-        // Naye user ko existing participants ki list bhejein
         socket.emit('existing-participants', existingParticipants);
-
-        // Room ke baaki users ko naye user ke baare mein batayein
         socket.to(meetingId).emit('user-connected', { name, email, socketId: socket.id });
     });
 
     // WebRTC Signaling Events
-
-    // User A, User B ko call kar raha hai (SDP Offer)
     socket.on('call-user', ({ offer, toSocketId }) => {
         const fromUserInfo = userSocketMap.get(socket.id);
         
