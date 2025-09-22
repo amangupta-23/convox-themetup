@@ -67,13 +67,15 @@ const emailToSocketIdMap = new Map();
 // Express API Routes
 
 // API to Create a new Meeting ID
-app.get('/create-meeting', async (req, res) => {
+app.post('/create-meeting', async (req, res) => {
     try {
         const meetingId = uuidv4();
         const newMeeting = new Meeting({ meetingId, users: [] });
         await newMeeting.save();
+        
         console.log(`New meeting created: ${meetingId}`);
-        res.json({ meetingId });
+        return res.status(201).json({ meetingId }); 
+        
     } catch (error) {
         console.error("Error creating meeting:", error);
         res.status(500).json({ error: "Failed to create meeting." });
