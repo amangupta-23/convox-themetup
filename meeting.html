@@ -379,69 +379,6 @@
 
         // Function to initialize the RTCPeerConnection
         function createPeerConnection(targetSocketId) {
-    const peer = new RTCPeerConnection(configuration);
-    peers[targetSocketId] = peer;
-
-    // Add local tracks to the connection
-    if (localStream) {
-        localStream.getTracks().forEach(track => {
-            peer.addTrack(track, localStream);
-        });
-    }
-
-    // --- Event 1: Receiving Remote Stream ---
-    peer.ontrack = (event) => {
-        const stream = event.streams[0];
-        const remoteVideoId = `video-${targetSocketId}`;
-        let remoteVideo = document.getElementById(remoteVideoId);
-
-        // If video element already exists (e.g., from an earlier stream update), just update srcObject
-        if (!remoteVideo) {
-            // Create new video element if it's the first time
-            remoteVideo = document.createElement('video');
-            remoteVideo.id = remoteVideoId;
-            remoteVideo.classList.add('remote-video');
-            const remoteUserName = participants[targetSocketId]?.name || 'Guest';
-            // We call addVideoStream to create the container
-            addVideoStream(remoteVideo, stream, remoteUserName); 
-        } else {
-            remoteVideo.srcObject = stream;
-        }
-        console.log(`✅ Remote stream from ${targetSocketId} received/updated.`);
-        
-        // ADDED: Check if the received stream has a video track
-        if (stream.getVideoTracks().length === 0) {
-            console.warn(`⚠️ Warning: Remote stream from ${targetSocketId} has NO video tracks. Black screen likely due to camera being off or failed on their end.`);
-        }
-    };
-
-    // --- Event 2: ICE Candidate Exchange ---
-    peer.onicecandidate = (event) => {
-        if (event.candidate) {
-            socket.emit('ice-candidate', {
-                candidate: event.candidate,
-                toSocketId: targetSocketId
-            });
-        }
-    };
-    
-    // ----------------------------------------------------------------------
-    // --- Event 3: ICE Connection State Change for Debugging (ADDED CODE) ---
-    // ----------------------------------------------------------------------
-    peer.oniceconnectionstatechange = () => {
-        const state = peer.iceConnectionState;
-        console.log(`📡 ICE State Change for ${targetSocketId}: ${state}`);
-        
-        // If the connection fails, it is a network/firewall issue causing the black screen.
-        if (state === 'failed' || state === 'disconnected') {
-            console.error(`❌ WebRTC Connection FAILED/DISCONNECTED with ${targetSocketId}. Black screen is highly likely due to a poor network connection or firewall block (TURN server may be needed).`);
-        }
-    };
-    // ----------------------------------------------------------------------
-    
-    return peer;
-}
-            function createPeerConnection(targetSocketId) {
             const peer = new RTCPeerConnection(configuration);
             peers[targetSocketId] = peer;
 
@@ -486,6 +423,12 @@
             return peer;
         }
 
+        /**
+         * Replaces the old track with a new track for all peer connections.
+         * Used for switching between camera and screen share.
+         * @param {MediaStreamTrack} newTrack - The track to switch to (video or screen).
+         * @param {string} kind - 'video' or 'audio'.
+         */
         function replaceTrack(newTrack, kind) {
             Object.values(peers).forEach(peer => {
                 // Find the sender for the specific track kind
