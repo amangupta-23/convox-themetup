@@ -15,14 +15,14 @@
         /* General Body & Fonts */
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #121212; /* Darker background */
+            background-color: #121212;
             color: #f0f0f0;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow: hidden; /* Prevent body scroll */
+            overflow: hidden;
         }
 
         /* Navbar */
@@ -34,7 +34,7 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #333;
-            flex-shrink: 0; /* Prevent navbar from shrinking */
+            flex-shrink: 0;
         }
         .logo {
             font-size: 1.5rem;
@@ -46,8 +46,8 @@
         /* Main Content Layout */
         .main-content {
             display: flex;
-            flex-grow: 1; /* Take remaining vertical space */
-            overflow: hidden; /* Important for child scrolling */
+            flex-grow: 1;
+            overflow: hidden;
         }
 
         /* Video Grid Area */
@@ -56,21 +56,43 @@
             display: flex;
             flex-direction: column;
             padding: 20px;
-            overflow-y: auto; /* Allow this area to scroll if content overflows */
+            overflow-y: auto;
         }
 
         .meeting-info {
             text-align: center;
             margin-bottom: 20px;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .meeting-info h1 {
             font-size: 1.75rem;
             font-weight: 700;
+            margin-bottom: 0.5rem;
         }
         .meeting-info p {
             color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        .copy-btn {
+            background: none;
+            border: none;
+            color: #3498db;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.2s ease;
+        }
+        .copy-btn:hover {
+            color: #2980b9;
+        }
+        .copy-btn.copied {
+            color: #27ae60;
+        }
+
 
         #video-grid {
             display: grid;
@@ -84,12 +106,11 @@
             position: relative;
             background-color: #000;
             border-radius: 12px;
-            overflow: hidden; /* Ensures video stays within rounded corners */
+            overflow: hidden;
             border: 2px solid transparent;
             transition: border-color 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            /* Important for aspect ratio in grid */
-            aspect-ratio: 16/9; 
+            aspect-ratio: 16/9;
         }
 
         .video-container:hover {
@@ -98,9 +119,9 @@
 
         .video-participant {
             width: 100%;
-            height: 100%; /* Fill the container */
+            height: 100%;
             object-fit: cover;
-            display: block; /* Removes bottom space under video */
+            display: block;
         }
 
         .name-tag {
@@ -113,19 +134,33 @@
             border-radius: 4px;
             font-size: 0.8rem;
             font-weight: 500;
+            z-index: 10;
+        }
+        .name-tag .audio-status {
+            margin-right: 5px;
+            color: #27ae60;
+        }
+        .name-tag .audio-status.muted {
+            color: #e74c3c;
         }
 
-        /* Participants Sidebar */
+
+        /* Sidebar Layout */
         .sidebar {
             width: 300px;
             background-color: #181818;
             border-left: 1px solid #333;
             display: flex;
             flex-direction: column;
-            padding: 1rem;
-            overflow-y: auto;
-            flex-shrink: 0; /* Prevent sidebar from shrinking */
+            flex-shrink: 0;
         }
+        .sidebar-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        /* Sidebar sections */
         .sidebar h2 {
             font-size: 1.2rem;
             margin-top: 0;
@@ -143,11 +178,62 @@
             font-size: 0.9rem;
             word-break: break-word;
             border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .sidebar li:last-child {
             border-bottom: none;
         }
 
+        /* Chat Section */
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border-top: 1px solid #333;
+        }
+        .messages {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 0.75rem;
+            background: #222;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+        .message .sender {
+            font-weight: 600;
+            color: #3498db;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            background: #181818;
+            border-top: 1px solid #333;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 0.5rem;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #2a2a2a;
+            color: #f0f0f0;
+        }
+        .chat-input button {
+            background: #3498db;
+            border: none;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        
         /* Controls Bar */
         .controls {
             position: fixed;
@@ -172,7 +258,7 @@
             background: #4b4b4b;
             border: none;
             border-radius: 50%;
-            width: 55px; /* Slightly larger */
+            width: 55px;
             height: 55px;
             color: #fff;
             cursor: pointer;
@@ -180,7 +266,7 @@
         }
         .controls button:hover {
             background: #6a6a6a;
-            transform: translateY(-3px); /* Add a slight lift */
+            transform: translateY(-3px);
         }
         
         /* Style for buttons when their function is 'off' (e.g., mic is muted) */
@@ -193,7 +279,7 @@
 
         .controls .icon {
             font-size: 1.3rem;
-            margin-bottom: 4px; /* Space between icon and label */
+            margin-bottom: 4px;
         }
         .controls .label {
             font-size: 0.6rem;
@@ -202,7 +288,7 @@
         }
 
         #end-call-btn {
-            background: #e53e3e; /* Always red */
+            background: #e53e3e;
         }
         #end-call-btn:hover {
             background: #c53030;
@@ -227,7 +313,7 @@
             .sidebar {
                 width: 100%;
                 box-sizing: border-box;
-                max-height: 200px; /* Limit height on mobile */
+                max-height: 200px;
                 border-left: none;
                 border-top: 1px solid #333;
             }
@@ -253,7 +339,7 @@
                 margin-bottom: 0;
             }
             .controls .label {
-                display: none; /* Hide labels on mobile to save space */
+                display: none;
             }
         }
     </style>
@@ -267,15 +353,30 @@
         <main class="video-area">
             <div class="meeting-info">
                 <h1>Live Meeting</h1>
-                <p>Meeting ID: <strong id="meeting-id-display"></strong></p>
+                <p>
+                    Meeting ID: <strong id="meeting-id-display"></strong>
+                    <button id="copy-link-btn" class="copy-btn" title="Copy Meeting Link">
+                        <i class="far fa-copy"></i>
+                    </button>
+                </p>
             </div>
             <div id="video-grid">
             </div>
         </main>
 
         <aside class="sidebar">
-            <h2>Participants</h2>
-            <ul id="participants"></ul>
+            <div class="sidebar-content">
+                <h2>Participants</h2>
+                <ul id="participants"></ul>
+            </div>
+            
+            <div class="chat-box">
+                <div class="messages" id="chat-messages"></div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input" placeholder="Send a message...">
+                    <button id="send-chat-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
         </aside>
     </div>
 
@@ -303,32 +404,26 @@
     </div>
 
     <script>
-        // Browser compatibility check
         const RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
         const RTCIceCandidate = window.RTCIceCandidate || window.mozRTCIceCandidate || window.webkitRTCIceCandidate;
 
-        // Socket.IO को आपके Render URL से कनेक्ट करें
+        // 🚩 The URL of your backend server running on Render
         const RENDER_BACKEND_URL = 'https://convox-themetup.onrender.com';
         const socket = io(RENDER_BACKEND_URL); 
 
         const videoGrid = document.getElementById('video-grid');
         const myVideo = document.createElement('video');
         myVideo.muted = true;
-        myVideo.id = 'my-video'; // Local video ID
-        const peers = {}; // Key: remoteSocketId, Value: RTCPeerConnection object
+        myVideo.id = 'my-video';
+        const peers = {};
 
-        // Get Meeting and User Details
         const urlParams = new URLSearchParams(window.location.search);
         const meetingId = urlParams.get('id');
         const name = localStorage.getItem('userName') || 'Guest';
         const email = localStorage.getItem('userEmail') || 'guest@example.com';
         
-        // Display Meeting ID
         document.getElementById('meeting-id-display').textContent = meetingId || 'N/A';
 
-        // ----------------------------------------------------
-        // 1. STUN/TURN Server Configuration
-        // ----------------------------------------------------
         const configuration = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' }
@@ -337,34 +432,26 @@
 
         let localStream;
         let screenShareStream = null;
-        let originalVideoTrack; // To store the original video track for easy switch back
-        const participants = {}; // Local state for participant list UI
-
+        let originalVideoTrack;
+        const participants = {};
 
         // ----------------------------------------------------
-        // Core Functions (IMPROVED)
+        // Core Functions
         // ----------------------------------------------------
 
-        // Function to display the video stream in the HTML with a container and name tag
         function addVideoStream(videoElement, stream, userName) {
-            // **⭐ FIX 1 (LOGIC IMPROVEMENT): Check and prevent adding duplicates**
-            // The video element's ID (which is 'my-video' for local, or 'video-remoteSocketId' for remote)
             const videoId = videoElement.id;
             const containerId = `container-${videoId}`;
             
-            // Check if the container already exists in the DOM
             const existingContainer = document.getElementById(containerId);
             
             if (existingContainer) {
-                // If container exists, just update the stream object (used for screen share/camera switch)
                 existingContainer.querySelector('.video-participant').srcObject = stream;
-                // Also update the name tag in case of reconnect/re-addition, though typically unnecessary.
                 const nameTagEl = existingContainer.querySelector('.name-tag');
                 if(nameTagEl) nameTagEl.textContent = userName;
-                return; // Exit the function to prevent adding a duplicate container
+                return;
             }
 
-            // --- If container does NOT exist, create it ---
             const videoContainer = document.createElement('div');
             videoContainer.classList.add('video-container');
             videoContainer.id = containerId; 
@@ -385,46 +472,38 @@
             videoGrid.append(videoContainer);
         }
 
-        // Function to initialize the RTCPeerConnection
         function createPeerConnection(targetSocketId) {
-            // **⭐ FIX 2 (CRITICAL FIX): Don't create new Peer Connection if it already exists**
             if (peers[targetSocketId]) {
-                console.warn(`Peer connection already exists for ${targetSocketId}. Returning existing one.`);
+                console.warn(`Peer connection already exists for ${targetSocketId}.`);
                 return peers[targetSocketId];
             }
             
             const peer = new RTCPeerConnection(configuration);
             peers[targetSocketId] = peer;
 
-            // Add local tracks to the connection
             if (localStream) {
                 localStream.getTracks().forEach(track => {
                     peer.addTrack(track, localStream);
                 });
             }
 
-            // --- Event 1: Receiving Remote Stream ---
             peer.ontrack = (event) => {
                 const stream = event.streams[0];
                 const remoteVideoId = `video-${targetSocketId}`;
                 let remoteVideo = document.getElementById(remoteVideoId);
 
-                // If stream is empty or has no tracks, don't proceed
                 if (!stream || stream.getTracks().length === 0) {
-                    console.warn(`Received empty stream or no tracks from ${targetSocketId}.`);
+                    console.warn(`Received empty stream from ${targetSocketId}.`);
                     return; 
                 }
 
-                // If video element already exists, just update srcObject (Fixes duplicate stream if track changes)
                 if (!remoteVideo) {
-                    // Create new video element if it's the first time
                     remoteVideo = document.createElement('video');
                     remoteVideo.id = remoteVideoId;
                     remoteVideo.classList.add('remote-video');
-                    remoteVideo.muted = false; // Remote video should NOT be muted
+                    remoteVideo.muted = false;
                     
                     const remoteUserName = participants[targetSocketId]?.name || 'Guest';
-                    // We call addVideoStream to create the container
                     addVideoStream(remoteVideo, stream, remoteUserName); 
                 } else {
                     remoteVideo.srcObject = stream;
@@ -432,7 +511,6 @@
                 console.log(`✅ Remote stream from ${targetSocketId} received/updated.`);
             };
 
-            // --- Event 2: ICE Candidate Exchange ---
             peer.onicecandidate = (event) => {
                 if (event.candidate) {
                     socket.emit('ice-candidate', {
@@ -445,50 +523,48 @@
             return peer;
         }
 
-        /**
-         * Replaces the old track with a new track for all peer connections.
-         * Used for switching between camera and screen share.
-         * @param {MediaStreamTrack} newTrack - The track to switch to (video or screen).
-         * @param {string} kind - 'video' or 'audio'.
-         */
         function replaceTrack(newTrack, kind) {
             Object.values(peers).forEach(peer => {
-                // Find the sender for the specific track kind
                 const sender = peer.getSenders().find(s => s.track && s.track.kind === kind);
                 
                 if (sender) {
                     sender.replaceTrack(newTrack)
-                        .then(() => console.log(`Track replaced successfully for peer: ${peer}`))
+                        .then(() => console.log(`Track replaced successfully for peer.`))
                         .catch(err => console.error(`Error replacing ${kind} track:`, err));
                 }
             });
         }
 
 
-        // Main function to start media and join the room
         async function startMedia(meetingId, name, email) {
             if (!meetingId || !name || !email) {
                 return console.error("Missing meeting details.");
             }
             try {
-                // 1. Get local media (camera and microphone)
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                originalVideoTrack = localStream.getVideoTracks()[0]; // Store original camera track
-
-                // Add Local Video ONLY ONCE here.
-                addVideoStream(myVideo, localStream, name + ' (You)'); 
-
-                // 2. Inform server that this user has joined and is ready
-                socket.emit('join-room', { meetingId, name, email });
+                originalVideoTrack = localStream.getVideoTracks()[0];
+                addVideoStream(myVideo, localStream, name + ' (You)');
                 
-                // Add self to participant list
-                participants[socket.id] = { name, email, socketId: socket.id };
+                participants[socket.id] = { 
+                    name, 
+                    email, 
+                    socketId: socket.id,
+                    isAudioMuted: false,
+                    isVideoMuted: false
+                };
+                
+                socket.emit('join-room', { 
+                    meetingId, 
+                    name, 
+                    email,
+                    isAudioMuted: !localStream.getAudioTracks()[0]?.enabled,
+                    isVideoMuted: !localStream.getVideoTracks()[0]?.enabled
+                });
                 renderParticipants();
 
             } catch (err) {
-                console.error('❌ Error accessing media (Ensure HTTPS):', err);
-                alert('Could not get access to your camera and microphone! Please check permissions and ensure the site is running on HTTPS.');
-                // Disable controls if media access fails
+                console.error('❌ Error accessing media:', err);
+                alert('Could not get access to your camera and microphone! Please ensure the site is on HTTPS and you have granted permissions.');
                 toggleAudioBtn.disabled = true;
                 toggleVideoBtn.disabled = true;
                 toggleScreenShareBtn.disabled = true;
@@ -496,7 +572,7 @@
         }
         
         // ----------------------------------------------------
-        // UI and Controls Logic (IMPROVED)
+        // UI and Controls Logic
         // ----------------------------------------------------
         const participantsList = document.getElementById('participants');
         const toggleAudioBtn = document.getElementById('toggle-audio-btn');
@@ -510,25 +586,37 @@
         const screenshareIcon = document.getElementById('screenshare-icon');
         const screenshareLabel = document.getElementById('screenshare-label');
         
-        // Helper function to update control button UI state
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendChatBtn = document.getElementById('send-chat-btn');
+
         function updateControlButton(btn, iconEl, labelEl, state, activeIcon, inactiveIcon, activeLabel, inactiveLabel) {
-            // state is boolean: true=active/enabled, false=inactive/disabled
             btn.setAttribute('aria-pressed', state);
             iconEl.className = state ? `${activeIcon} icon` : `${inactiveIcon} icon`;
             labelEl.textContent = state ? activeLabel : inactiveLabel;
         }
 
-        // UI: Renders the participant list
         function renderParticipants(){
             participantsList.innerHTML='';
-            Object.values(participants).forEach(u=>{
-                const li=document.createElement('li');
-                li.textContent = u.name + (u.socketId === socket.id ? ' (You)' : '');
+            Object.values(participants).forEach(u => {
+                const li = document.createElement('li');
+                const audioIcon = document.createElement('i');
+                audioIcon.classList.add('fas');
+                audioIcon.classList.add(u.isAudioMuted ? 'fa-microphone-slash' : 'fa-microphone');
+                audioIcon.style.color = u.isAudioMuted ? '#e74c3c' : '#2ecc71';
+                
+                const videoIcon = document.createElement('i');
+                videoIcon.classList.add('fas');
+                videoIcon.classList.add(u.isVideoMuted ? 'fa-video-slash' : 'fa-video');
+                videoIcon.style.color = u.isVideoMuted ? '#e74c3c' : '#2ecc71';
+                
+                li.appendChild(audioIcon);
+                li.appendChild(videoIcon);
+                li.innerHTML += `<span>${u.name} ${u.socketId === socket.id ? '(You)' : ''}</span>`;
                 participantsList.appendChild(li);
             });
         }
 
-        // UI: Toggle Audio
         toggleAudioBtn.addEventListener('click', ()=>{
             if(!localStream) return;
             const track = localStream.getAudioTracks()[0];
@@ -547,9 +635,13 @@
                 'Mute', 
                 'Unmute'
             );
+            socket.emit('user-status-change', { 
+                statusType: 'audio', 
+                isMuted: !isEnabled,
+                meetingId: meetingId
+            });
         });
 
-        // UI: Toggle Video
         toggleVideoBtn.addEventListener('click', ()=>{
             if(!localStream) return;
             const track = localStream.getVideoTracks()[0];
@@ -568,78 +660,58 @@
                 'Stop', 
                 'Start'
             );
+            socket.emit('user-status-change', { 
+                statusType: 'video', 
+                isMuted: !isEnabled,
+                meetingId: meetingId
+            });
         });
 
-        // UI: Toggle Screen Share (IMPROVED LOGIC)
         toggleScreenShareBtn.addEventListener('click', async ()=>{
             if(!localStream) return alert('Start camera/mic first.');
             
             const isScreenSharing = screenShareStream !== null;
 
             if(isScreenSharing){
-                // ------------------ STOP SCREEN SHARE ------------------
                 screenShareStream.getTracks().forEach(t=>t.stop());
                 screenShareStream = null;
-                
-                // 1. Switch local video back to camera stream (myVideo is the element)
                 myVideo.srcObject = localStream;
-                
-                // 2. Replace the screen share track with the original camera video track for all peers
                 replaceTrack(originalVideoTrack, 'video');
-
-                // 3. Re-enable video button 
                 toggleVideoBtn.disabled=false;
-                
-                // 4. Update UI
                 updateControlButton(
                     toggleScreenShareBtn, 
                     screenshareIcon, 
                     screenshareLabel, 
                     false, 
-                    'fas fa-stop-circle', // Active Icon
-                    'fas fa-desktop', // Inactive Icon
+                    'fas fa-stop-circle',
+                    'fas fa-desktop',
                     'Stop', 
                     'Share'
                 );
-
             } else {
-                // ------------------ START SCREEN SHARE ------------------
                 try{
-                    // Get display media, request video, but NOT audio (we keep the existing camera audio)
                     screenShareStream = await navigator.mediaDevices.getDisplayMedia({
                         video: true,
-                        audio: false // We use the audio from localStream
+                        audio: false
                     });
                     
                     const screenVideoTrack = screenShareStream.getVideoTracks()[0];
-                    
-                    // Stop screen share if user clicks 'Stop Sharing' button in the browser UI
                     screenVideoTrack.onended = () => {
-                        // This ensures the toggle logic runs if user stops via browser button
                         if(screenShareStream) toggleScreenShareBtn.click(); 
                     };
-
-                    // 1. Switch local video display to screen share stream
                     myVideo.srcObject = screenShareStream;
-                    
-                    // 2. Replace the camera video track with the screen video track for all peers
                     replaceTrack(screenVideoTrack, 'video');
-                    
-                    // 3. Disable the video toggle button 
                     toggleVideoBtn.disabled=true;
-                    
-                    // 4. Update UI
                     updateControlButton(
                         toggleScreenShareBtn, 
                         screenshareIcon, 
                         screenshareLabel, 
                         true, 
-                        'fas fa-stop-circle', // Active Icon
-                        'fas fa-desktop', // Inactive Icon
+                        'fas fa-stop-circle',
+                        'fas fa-desktop',
                         'Stop', 
                         'Share'
                     );
-
                 }catch(err){
                     console.error('Error starting screen share:', err);
                     alert('Cannot share screen. Permissions denied or operation cancelled.');
@@ -649,40 +721,75 @@
             }
         });
 
-        // UI: End Call
         endCallBtn.addEventListener('click', ()=>{
             if(localStream) localStream.getTracks().forEach(t=>t.stop());
             if(screenShareStream) screenShareStream.getTracks().forEach(t=>t.stop());
             
-            // Close all peer connections
             Object.values(peers).forEach(p => p.close());
-
-            // Signal server to leave
             socket.emit('leave-room', meetingId); 
-
-            // Redirect back to index/home page
             window.location.href='index.html';
         });
         
-        // ----------------------------------------------------
-        // Socket.IO Signaling Handlers (The WebRTC Connection Logic)
-        // ----------------------------------------------------
+        const copyLinkBtn = document.getElementById('copy-link-btn');
+        copyLinkBtn.addEventListener('click', () => {
+            const meetingLink = window.location.href;
+            navigator.clipboard.writeText(meetingLink).then(() => {
+                copyLinkBtn.classList.add('copied');
+                copyLinkBtn.title = 'Copied!';
+                setTimeout(() => {
+                    copyLinkBtn.classList.remove('copied');
+                    copyLinkBtn.title = 'Copy Meeting Link';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text:', err);
+            });
+        });
 
-        // A. EXISTING USERS: Naya user unhe call karega (Sends Offer)
+        sendChatBtn.addEventListener('click', () => sendMessage());
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message) {
+                displayMessage(name, message, true);
+                socket.emit('chat-message', { message, meetingId, senderName: name });
+                chatInput.value = '';
+            }
+        }
+
+        function displayMessage(sender, message, isMe = false) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            if (isMe) {
+                messageElement.style.textAlign = 'right';
+            }
+            const senderElement = document.createElement('div');
+            senderElement.classList.add('sender');
+            senderElement.textContent = isMe ? 'You' : sender;
+            const textElement = document.createElement('div');
+            textElement.textContent = message;
+
+            messageElement.appendChild(senderElement);
+            messageElement.appendChild(textElement);
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // ----------------------------------------------------
+        // Socket.IO Signaling Handlers
+        // ----------------------------------------------------
         socket.on('existing-participants', async (existingParticipants) => {
             console.log('Existing users found:', existingParticipants);
-            
             existingParticipants.forEach(async (participant) => {
                 const targetSocketId = participant.socketId;
-                
-                // Add to participants list (if not already added by 'user-connected')
                 if (!participants[targetSocketId]) {
                     participants[targetSocketId] = participant; 
                 }
-
-                // Call the improved function that checks for duplicates
                 const peer = createPeerConnection(targetSocketId);
-
                 try {
                     const offer = await peer.createOffer();
                     await peer.setLocalDescription(offer);
@@ -695,35 +802,37 @@
             renderParticipants();
         });
 
-
-        // B. NEW USER CONNECTED: Existing users naye user ke call ke liye taiyar honge
         socket.on('user-connected', (user) => {
             console.log(`👤 New user connected: ${user.name} (${user.socketId}). Preparing to receive call.`);
-            
-            // Add/Update to participants list (Fixes participant list duplication)
             if (!participants[user.socketId]) {
                 participants[user.socketId] = user; 
-                renderParticipants(); // Re-render only if truly new
+                renderParticipants();
             }
-            
-            // Existing user naye user ke liye Peer Connection banayega.
-            // The improved function prevents duplicate creation.
             createPeerConnection(user.socketId);
         });
 
+        socket.on('user-status-change', ({ socketId, statusType, isMuted }) => {
+            if (participants[socketId]) {
+                if (statusType === 'audio') {
+                    participants[socketId].isAudioMuted = isMuted;
+                } else if (statusType === 'video') {
+                    participants[socketId].isVideoMuted = isMuted;
+                }
+                renderParticipants();
+            }
+        });
 
-        // C. INCOMING CALL: Pehle se maujood user naye user ki call uthayega (Receives Offer, Sends Answer)
+        socket.on('chat-message', ({ senderName, message }) => {
+            displayMessage(senderName, message);
+        });
+
         socket.on('incoming-call', async ({ offer, from, fromName }) => {
             console.log(`Incoming call from: ${fromName} (${from})`);
-            
-            // Call the improved function that checks for duplicates
             let peer = createPeerConnection(from);
-
             try {
                 await peer.setRemoteDescription(new RTCSessionDescription(offer));
                 const answer = await peer.createAnswer();
                 await peer.setLocalDescription(answer);
-
                 socket.emit('make-answer', { answer: answer, toSocketId: from });
                 console.log(`🎙️ Sending answer back to ${fromName}.`);
             } catch (error) {
@@ -731,8 +840,6 @@
             }
         });
 
-
-        // D. ANSWER MADE: Naye user ko call ka jawab mila (Receives Answer)
         socket.on('answer-made', async ({ answer, from }) => {
             const peer = peers[from];
             if (peer) {
@@ -745,8 +852,6 @@
             }
         });
 
-
-        // E. ICE CANDIDATE: Network information exchange
         socket.on('ice-candidate', async ({ candidate, from }) => {
             const peer = peers[from];
             if (peer && candidate) {
@@ -758,27 +863,20 @@
             }
         });
 
-        // F. USER DISCONNECTED
         socket.on('user-disconnected', ({ socketId }) => {
             if (peers[socketId]) {
                 peers[socketId].close(); 
                 delete peers[socketId];
-                
-                // Remove the participant from the list
                 delete participants[socketId];
                 renderParticipants();
-
-                // Remove the video container from the DOM
                 const videoContainer = document.getElementById(`container-video-${socketId}`);
                 if (videoContainer) {
                     videoContainer.remove();
                 }
-                
                 console.log(`User ${socketId} disconnected. Video removed.`);
             }
         });
 
-        // Start the process when the script loads
         if (meetingId && name && email) {
             startMedia(meetingId, name, email);
         } else {
