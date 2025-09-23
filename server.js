@@ -7,11 +7,13 @@ import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { fileURLToPath } from 'url';
+// Peer.js server को import करें
+import { ExpressPeerServer } from 'peer'; 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// .env file se environment variables load karein
+// .env file से environment variables load करें
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
@@ -23,7 +25,7 @@ const NETLIFY_ORIGIN = 'https://convox-themetup.netlify.app';
 const ICE_SERVERS = [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:global.stun.twilio.com:3478' }
-    // अगर फिर भी ब्लैक स्क्रीन आए, तो TURN सर्वर की ज़रूरत पड़ेगी।
+    // अगर फिर भी ब्लैक स्क्रीन आए, तो TURN सर्वर की ज़रूरत पड़ेगी।
 ];
 
 const corsOptions = {
@@ -58,6 +60,14 @@ const meetingSchema = new Schema({
 const Meeting = model('Meeting', meetingSchema);
 
 const server = createServer(app);
+
+// 🚨 महत्वपूर्ण सुधार 4: Peer.js server को इंटीग्रेट करें
+// यह WebRTC Peer-to-Peer connections को handle करता है।
+const peerServer = ExpressPeerServer(server, {
+    debug: true
+});
+app.use('/peerjs', peerServer);
+
 // Socket.IO के लिए CORS
 const io = new Server(server, {
     cors: corsOptions
@@ -92,7 +102,7 @@ app.post('/join-meeting', async (req, res) => {
     try {
         const meeting = await Meeting.findOne({ meetingId });
         if (meeting) {
-             // 🚨 सुधार 3: Frontend को ICE Servers की जानकारी भेजें
+            // 🚨 सुधार 3: Frontend को ICE Servers की जानकारी भेजें
             return res.status(200).json({ success: true, message: 'Meeting found', iceServers: ICE_SERVERS });
         } else {
             return res.status(404).json({ error: 'Meeting ID not found.' });
@@ -142,6 +152,7 @@ io.on('connection', socket => {
         });
 
         socket.emit('existing-participants', existingParticipants);
+        // 🚨 सुधार 5: एक ही event में name, email, और socketId को भेजें
         socket.to(meetingId).emit('user-connected', { name, email, socketId: socket.id });
     });
 
