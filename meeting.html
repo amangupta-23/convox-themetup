@@ -1,363 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Convox Elite | Live Meeting</title>
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convox Elite - Live Meeting</title>
+  <script src="https://kit.fontawesome.com/a7b1b11b13.js" crossorigin="anonymous"></script>
+  <script src="https://convox-themetup.onrender.com/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap">
   <style>
-    :root {
-      --primary: #4c6ef5;
-      --secondary: #adb5bd;
-      --bg-dark: #121212;
-      --bg-light: #1e1e1e;
-      --text-light: #f8f9fa;
-      --accent: #4c6ef5;
-      --danger: #e03131;
-      --success: #37b24d;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    body {
-      background: var(--bg-dark);
-      color: var(--text-light);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    header {
-      background: var(--bg-light);
-      padding: 12px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #2a2a2a;
-    }
-
-    header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      color: var(--primary);
-    }
-
-    main {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* Video grid */
-    .video-grid {
-      flex: 3;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 10px;
-      padding: 10px;
-      background: #181818;
-      overflow-y: auto;
-    }
-
-    .video-container {
-      position: relative;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #000;
-    }
-
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 10px;
-    }
-
-    .username-label {
-      position: absolute;
-      bottom: 8px;
-      left: 8px;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 3px 8px;
-      border-radius: 5px;
-      font-size: 0.9rem;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      flex: 1;
-      background: var(--bg-light);
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid #2a2a2a;
-    }
-
-    .sidebar section {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px;
-    }
-
-    .participants-list li,
-    .chat-messages div {
-      margin-bottom: 8px;
-      background: #222;
-      padding: 8px;
-      border-radius: 6px;
-    }
-
-    .chat-input {
-      display: flex;
-      border-top: 1px solid #2a2a2a;
-    }
-
-    .chat-input input {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      outline: none;
-      background: #181818;
-      color: var(--text-light);
-    }
-
-    .chat-input button {
-      background: var(--primary);
-      border: none;
-      color: white;
-      padding: 0 16px;
-      cursor: pointer;
-    }
-
-    footer {
-      background: var(--bg-light);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-      border-top: 1px solid #2a2a2a;
-      gap: 12px;
-    }
-
-    .control-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      color: var(--text-light);
-      transition: 0.3s;
-    }
-
-    .control-btn:hover {
-      color: var(--primary);
-    }
-
-    .recording-indicator {
-      color: var(--danger);
-      font-weight: 600;
-      animation: blink 1s infinite;
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
+    body { font-family: Montserrat,sans-serif; background:#121212; color:#f0f0f0; margin:0; padding:0; }
+    .main-content { display:flex; }
+    .video-area { flex-grow:1; padding:20px; }
+    .meeting-info { text-align:center; }
+    .sidebar { width:300px; background:#181818; border-left:1px solid #333; }
+    .sidebar-content, .chat-box { padding:1rem; }
+    .sidebar-header, .chat-header { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #444; padding-bottom:0.4rem; }
+    .toggle-btn { background:none; border:none; color:#fff; font-size:1.1rem; cursor:pointer; transition:.3s; }
+    .toggle-btn.collapsed i { transform:rotate(180deg); }
+    .collapsible { transition:max-height .4s,opacity .4s; overflow:hidden; max-height:300px; opacity:1; }
+    .collapsed { max-height:0!important; opacity:.1!important; }
+    #participants-list { list-style:none; padding:0; }
+    #participants-list li { padding:.5rem 0; border-bottom:1px solid #2a2a2a; display:flex; align-items:center; gap:8px; }
+    #participants-list li:last-child { border-bottom:none; }
+    .badge { background:#3498db; color:#fff; border-radius:12px; padding:0 8px; font-size:0.9rem; margin-left:8px; }
+    .controls { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:1rem; background:rgba(30,30,30,0.85); border-radius:50px; padding:0.75rem 1.5rem; }
+    .controls button { background:#4b4b4b; border:none; width:55px; height:55px; border-radius:50%; color:#fff; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .controls .icon { font-size:1.3rem; margin-bottom:4px; }
+    .controls .label { font-size:0.6rem; font-weight:600; text-transform:uppercase; }
+    .end-call-btn { background:#e53e3e; }
+    .end-call-btn:hover { background:#c53030; }
+    .controls button:disabled { background:#2a2a2a; cursor:not-allowed; opacity:.6; }
+    .video-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:15px; }
+    .video-container { background:#000; border-radius:12px; overflow:hidden; border:2px solid transparent; box-shadow:0 4px 15px rgba(0,0,0,.3); aspect-ratio:16/9; position:relative; }
+    .video-container:hover { border-color: #3498db; }
+    .video-participant { width:100%; height:100%; object-fit:cover; }
+    .name-tag { position:absolute; bottom:8px; left:8px; background:rgba(0,0,0,.6); color:#fff; padding:4px 8px; border-radius:4px; font-size:0.8rem; font-weight:500; z-index:10; }
+    .audio-status.muted { color:#e74c3c; }
+    .audio-status { margin-right:5px; color:#27ae60; }
+    .chat-box { display:flex; flex-direction:column; border-top:1px solid #333; height:100%; }
+    .messages { flex-grow:1; overflow-y:auto; }
+    .message { margin-bottom:0.75rem; background:#222; padding:0.5rem; border-radius:8px; }
+    .message .sender { font-weight:600; color:#3498db; }
+    .chat-input { display:flex; padding:1rem; border-top:1px solid #333; background:#181818; }
+    .chat-input input { flex-grow:1; padding:0.5rem; border:1px solid #444; border-radius:4px; background:#2a2a2a; color:#f0f0f0; }
+    .chat-input button { background:#3498db; border:none; color:#fff; padding:0.5rem 1rem; border-radius:4px; margin-left:8px; cursor:pointer; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Convox Elite</h1>
-    <span id="recordingStatus"></span>
+  <header class="navbar">
+    <div class="logo">Convox Elite</div>
   </header>
-
-  <main>
-    <div class="video-grid" id="videoGrid"></div>
-
-    <div class="sidebar">
-      <section>
-        <h3>Participants</h3>
-        <ul id="participantsList"></ul>
-      </section>
-
-      <section>
-        <h3>Chat</h3>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input">
-          <input id="chatInput" type="text" placeholder="Type a message..." />
-          <button id="sendChat"><i class="fa fa-paper-plane"></i></button>
+  <div class="main-content">
+    <main class="video-area">
+      <div class="meeting-info">
+        <h1>Live Meeting</h1>
+        <p>
+          Meeting ID: <strong id="meeting-id-display">NA</strong>
+          <button id="copy-link-btn" class="copy-btn" title="Copy Meeting Link"><i class="far fa-copy"></i></button>
+        </p>
+      </div>
+      <div id="video-grid" class="video-grid"></div>
+    </main>
+    <aside class="sidebar">
+      <div class="sidebar-content collapsible" id="participants-section">
+        <div class="sidebar-header">
+          <h2>Participants <span id="participants-count" class="badge">0</span></h2>
+          <button class="toggle-btn" id="toggle-participants-btn" title="Minimize/Maximize"><i class="fas fa-chevron-up"></i></button>
         </div>
-      </section>
-    </div>
-  </main>
-
-  <footer>
-    <div class="control-btn" id="toggleAudio">
-      <i class="fa fa-microphone"></i>
-      <span>Mute</span>
-    </div>
-    <div class="control-btn" id="toggleVideo">
-      <i class="fa fa-video"></i>
-      <span>Stop Video</span>
-    </div>
-    <div class="control-btn" id="screenShare">
-      <i class="fa fa-desktop"></i>
-      <span>Share</span>
-    </div>
-    <div class="control-btn" id="recordingBtn">
-      <i class="fa fa-record-vinyl"></i>
-      <span>Record</span>
-    </div>
-    <div class="control-btn" id="endCall">
-      <i class="fa fa-phone-slash"></i>
-      <span>End</span>
-    </div>
-  </footer>
-
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
+        <ul id="participants-list"></ul>
+      </div>
+      <div class="chat-box collapsible" id="messages-section">
+        <div class="chat-header">
+          <span>Messages</span>
+          <button class="toggle-btn" id="toggle-messages-btn" title="Minimize/Maximize"><i class="fas fa-chevron-up"></i></button>
+        </div>
+        <div class="messages" id="chat-messages"></div>
+        <div class="chat-input">
+          <input type="text" id="chat-input" placeholder="Send a message...">
+          <button id="send-chat-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <div class="controls" role="toolbar" aria-label="Meeting controls">
+    <button id="toggle-audio-btn" title="Toggle Audio" aria-pressed="true"><i id="audio-icon" class="fas fa-microphone icon"></i><span id="audio-label" class="label">Mute</span></button>
+    <button id="toggle-video-btn" title="Toggle Video" aria-pressed="true"><i id="video-icon" class="fas fa-video icon"></i><span id="video-label" class="label">Stop</span></button>
+    <button id="toggle-screen-share-btn" title="Screen Share" aria-pressed="false"><i id="screenshare-icon" class="fas fa-desktop icon"></i><span id="screenshare-label" class="label">Share</span></button>
+    <button id="start-recording-btn" title="Start Recording" aria-pressed="false" disabled><i id="recording-icon" class="fas fa-record-vinyl icon"></i><span id="recording-label" class="label">Record</span></button>
+    <button id="end-call-btn" class="end-call-btn" title="End Call"><i class="fas fa-phone-slash icon"></i><span class="label">End</span></button>
+  </div>
   <script>
+    // MAIN SOCKET CONNECTIONS & GLOBALS
     const socket = io("https://convox-themetup.onrender.com");
+    const videoGrid = document.getElementById("video-grid");
+    const myVideo = document.createElement("video");
+    myVideo.muted = true;
+    myVideo.id = "my-video";
+    let localStream, screenShareStream = null, originalVideoTrack;
+    let participants = {};
+    let peers = {};
 
-    const videoGrid = document.getElementById("videoGrid");
-    const participantsList = document.getElementById("participantsList");
-    const chatMessages = document.getElementById("chatMessages");
-    const chatInput = document.getElementById("chatInput");
-    const sendChat = document.getElementById("sendChat");
+    // GET MEETING PARAMETERS
+    const urlParams = new URLSearchParams(window.location.search);
+    const meetingId = urlParams.get("id");
+    const name = localStorage.getItem("userName") || "Guest";
+    document.getElementById("meeting-id-display").textContent = meetingId ?? "NA";
 
-    const audioBtn = document.getElementById("toggleAudio");
-    const videoBtn = document.getElementById("toggleVideo");
-    const screenBtn = document.getElementById("screenShare");
-    const recordingBtn = document.getElementById("recordingBtn");
-    const endCallBtn = document.getElementById("endCall");
-
-    const recordingStatus = document.getElementById("recordingStatus");
-
-    let localStream, mediaRecorder, recordedChunks = [], isRecording = false;
-    let peers = {}, username = prompt("Enter your name") || "Guest";
-
-    // -----------------------------
-    // MEDIA SETUP
-    // -----------------------------
-    async function startMedia() {
-      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      addVideoStream(username, localStream, true);
-      socket.emit("join-room", { username });
+    // PARTICIPANTS RENDER
+    function renderParticipants() {
+      // Participants number
+      const participantsCount = Object.keys(participants).length;
+      document.getElementById("participants-count").textContent = participantsCount;
+      // List render
+      const participantsList = document.getElementById("participants-list");
+      participantsList.innerHTML = "";
+      Object.values(participants).forEach(u => {
+        const li = document.createElement("li");
+        const audioIcon = document.createElement("i");
+        audioIcon.classList.add("fas", u.isAudioMuted ? "fa-microphone-slash" : "fa-microphone");
+        audioIcon.style.color = u.isAudioMuted ? "#e74c3c" : "#2ecc71";
+        const videoIcon = document.createElement("i");
+        videoIcon.classList.add("fas", u.isVideoMuted ? "fa-video-slash" : "fa-video");
+        videoIcon.style.color = u.isVideoMuted ? "#e74c3c" : "#2ecc71";
+        li.appendChild(audioIcon);
+        li.appendChild(videoIcon);
+        // name show
+        li.innerHTML += `<span class="name">${u.name}${u.socketId === socket.id ? " (You)" : ""}</span>`;
+        participantsList.appendChild(li);
+      });
     }
 
-    function addVideoStream(name, stream, isLocal=false) {
-      const container = document.createElement("div");
-      container.className = "video-container";
-      const video = document.createElement("video");
-      video.srcObject = stream;
-      video.autoplay = true;
-      if (isLocal) video.muted = true;
-      const label = document.createElement("div");
-      label.className = "username-label";
-      label.innerText = name;
-      container.append(video, label);
-      videoGrid.appendChild(container);
+    // COLLAPSE / MINIMIZE SECTIONS
+    document.getElementById("toggle-participants-btn").addEventListener("click", function() {
+      const section = document.getElementById("participants-section");
+      section.classList.toggle("collapsed");
+      this.classList.toggle("collapsed");
+      const icon = this.querySelector("i");
+      icon.classList.toggle("fa-chevron-up");
+      icon.classList.toggle("fa-chevron-down");
+    });
+
+    document.getElementById("toggle-messages-btn").addEventListener("click", function() {
+      const section = document.getElementById("messages-section");
+      section.classList.toggle("collapsed");
+      this.classList.toggle("collapsed");
+      const icon = this.querySelector("i");
+      icon.classList.toggle("fa-chevron-up");
+      icon.classList.toggle("fa-chevron-down");
+    });
+
+    // PARTICIPANTS JOIN/LEAVE EVENT HANDLING
+    socket.on("existing-participants", users => {
+      users.forEach(user => {
+        participants[user.socketId] = user;
+      });
+      renderParticipants();
+    });
+    socket.on("user-connected", user => {
+      participants[user.socketId] = user;
+      renderParticipants();
+    });
+    socket.on("user-disconnected", socketId => {
+      delete participants[socketId];
+      renderParticipants();
+      // Remove video if needed
+      const videoContainer = document.getElementById("container-video-" + socketId);
+      if (videoContainer) videoContainer.remove();
+    });
+
+    // RECORD BUTTON FUNCTIONALITY
+    const recordingBtn = document.getElementById("start-recording-btn");
+    const recordingIcon = document.getElementById("recording-icon");
+    const recordingLabel = document.getElementById("recording-label");
+    let mediaRecorder = null, recordedChunks = [], isRecording = false, combinedStream = null;
+
+    function checkRecordingSupport() {
+      if (window.MediaRecorder && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        recordingBtn.disabled = false;
+        recordingBtn.title = "Start Recording";
+      } else {
+        recordingBtn.disabled = true;
+        recordingBtn.title = "Recording not supported in your browser.";
+      }
     }
+    checkRecordingSupport();
 
-    // -----------------------------
-    // CONTROLS
-    // -----------------------------
-    audioBtn.onclick = () => {
-      const audioTrack = localStream.getAudioTracks()[0];
-      audioTrack.enabled = !audioTrack.enabled;
-      audioBtn.querySelector("i").className = audioTrack.enabled ? "fa fa-microphone" : "fa fa-microphone-slash";
-      audioBtn.querySelector("span").innerText = audioTrack.enabled ? "Mute" : "Unmute";
-    };
-
-    videoBtn.onclick = () => {
-      const videoTrack = localStream.getVideoTracks()[0];
-      videoTrack.enabled = !videoTrack.enabled;
-      videoBtn.querySelector("i").className = videoTrack.enabled ? "fa fa-video" : "fa fa-video-slash";
-      videoBtn.querySelector("span").innerText = videoTrack.enabled ? "Stop Video" : "Start Video";
-    };
-
-    screenBtn.onclick = async () => {
-      const displayStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-      const videoTrack = displayStream.getVideoTracks()[0];
-      const sender = Object.values(peers).map(pc => pc.getSenders().find(s => s.track.kind === "video"))[0];
-      if (sender) sender.replaceTrack(videoTrack);
-
-      videoTrack.onended = () => {
-        sender.replaceTrack(localStream.getVideoTracks()[0]);
-      };
-    };
-
-    endCallBtn.onclick = () => {
-      Object.values(peers).forEach(pc => pc.close());
-      localStream.getTracks().forEach(track => track.stop());
-      socket.disconnect();
-      alert("Meeting ended.");
-      window.location.href = "index.html";
-    };
-
-    // -----------------------------
-    // CHAT
-    // -----------------------------
-    sendChat.onclick = () => {
-      const msg = chatInput.value.trim();
-      if (!msg) return;
-      socket.emit("chat-message", { username, message: msg });
-      addChat(username, msg);
-      chatInput.value = "";
-    };
-
-    socket.on("chat-message", ({ username, message }) => addChat(username, message));
-
-    function addChat(user, msg) {
-      const div = document.createElement("div");
-      div.innerHTML = `<strong>${user}:</strong> ${msg}`;
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    // -----------------------------
-    // RECORDING FEATURE
-    // -----------------------------
-    recordingBtn.onclick = () => {
+    recordingBtn.addEventListener("click", async function() {
       if (!isRecording) {
-        if (!localStream) return alert("Start camera before recording!");
+        if (!localStream) {
+          alert("Need webcam/mic access first!");
+          return;
+        }
+        // If screen sharing started, include that
+        if (screenShareStream) {
+          combinedStream = new MediaStream([...localStream.getTracks().filter(t => t.kind === 'audio'), ...screenShareStream.getTracks()]);
+        } else {
+          combinedStream = localStream;
+        }
         recordedChunks = [];
-        mediaRecorder = new MediaRecorder(localStream, { mimeType: "video/webm; codecs=vp9" });
-
-        mediaRecorder.ondataavailable = e => e.data.size && recordedChunks.push(e.data);
-        mediaRecorder.onstop = () => {
+        try {
+          mediaRecorder = new MediaRecorder(combinedStream, { mimeType: "video/webm; codecs=vp8,opus" });
+        } catch (e) {
+          console.error("Recording initialization error", e);
+          alert("Recording not supported in this format: " + e.message);
+          return;
+        }
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+        mediaRecorder.onstop = function() {
           const blob = new Blob(recordedChunks, { type: "video/webm" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `recording-${Date.now()}.webm`;
+          a.download = "meeting-recording.webm";
+          document.body.appendChild(a);
           a.click();
+          setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 10000);
+          if (combinedStream !== localStream) combinedStream.getTracks().forEach(track => track.stop());
         };
-
         mediaRecorder.start();
         isRecording = true;
-        recordingStatus.innerHTML = '<span class="recording-indicator">● Recording...</span>';
-        recordingBtn.querySelector("i").className = "fa fa-stop-circle";
-        recordingBtn.querySelector("span").innerText = "Stop";
+        recordingIcon.className = "fas fa-stop icon";
+        recordingLabel.textContent = "Stop";
+        recordingBtn.title = "Stop Recording";
+        recordingBtn.style.background = "#e53e3e";
       } else {
         mediaRecorder.stop();
         isRecording = false;
-        recordingStatus.innerHTML = "";
-        recordingBtn.querySelector("i").className = "fa fa-record-vinyl";
-        recordingBtn.querySelector("span").innerText = "Record";
+        recordingIcon.className = "fas fa-record-vinyl icon";
+        recordingLabel.textContent = "Record";
+        recordingBtn.title = "Start Recording";
+        recordingBtn.style.background = "";
       }
-    };
+    });
 
+    // INITIALIZE VIDEO & MEDIA
+    async function startMedia() {
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        originalVideoTrack = localStream.getVideoTracks()[0];
+        addVideoStream(myVideo, localStream, name + " (You)");
+        participants[socket.id] = { name, socketId: socket.id, isAudioMuted: false, isVideoMuted: false };
+        socket.emit("join-room", meetingId, name, false, false);
+        renderParticipants();
+      } catch (err) {
+        alert("Could not get access to your camera and microphone! Please ensure the site is on HTTPS and you have granted permissions.");
+      }
+    }
     startMedia();
+
+    // Add video stream logic (simplified)
+    function addVideoStream(videoElement, stream, userName) {
+      const containerId = "container-" + videoElement.id;
+      let videoContainer = document.getElementById(containerId);
+      if (!videoContainer) {
+        videoContainer = document.createElement("div");
+        videoContainer.classList.add("video-container");
+        videoContainer.id = containerId;
+        // name tag
+        const nameTag = document.createElement("div");
+        nameTag.classList.add("name-tag");
+        nameTag.textContent = userName;
+        videoElement.srcObject = stream;
+        videoElement.addEventListener("loadedmetadata", () => videoElement.play());
+        videoElement.classList.add("video-participant");
+        videoContainer.appendChild(videoElement);
+        videoContainer.appendChild(nameTag);
+        videoGrid.appendChild(videoContainer);
+      } else {
+        videoContainer.querySelector(".video-participant").srcObject = stream;
+        videoContainer.querySelector(".name-tag").textContent = userName;
+      }
+    }
+
+    // Chat message handling
+    function displayMessage(sender, message, isMe = false) {
+      const messageElement = document.createElement("div");
+      messageElement.classList.add("message");
+      if (isMe) messageElement.style.textAlign = "right";
+      const senderElement = document.createElement("div");
+      senderElement.classList.add("sender");
+      senderElement.textContent = isMe ? "You" : sender;
+      const textElement = document.createElement("div");
+      textElement.textContent = message;
+      messageElement.appendChild(senderElement);
+      messageElement.appendChild(textElement);
+      document.getElementById("chat-messages").appendChild(messageElement);
+      document.getElementById("chat-messages").scrollTop = document.getElementById("chat-messages").scrollHeight;
+    }
+    document.getElementById("send-chat-btn").addEventListener("click", () => {
+      const message = document.getElementById("chat-input").value.trim();
+      if (message) {
+        displayMessage(name, message, true);
+        socket.emit("chat-message", message, meetingId, name);
+        document.getElementById("chat-input").value = "";
+      }
+    });
+    document.getElementById("chat-input").addEventListener("keypress", function(e){
+      if (e.key === "Enter") document.getElementById("send-chat-btn").click();
+    });
+
+    // Copy meeting ID link
+    document.getElementById("copy-link-btn").addEventListener("click", function() {
+      const meetingLink = window.location.href;
+      navigator.clipboard.writeText(meetingLink).then(() => {
+        this.classList.add("copied");
+        this.title = "Copied!";
+        setTimeout(() => {
+          this.classList.remove("copied");
+          this.title = "Copy Meeting Link";
+        }, 2000);
+      });
+    });
+
+    // End call logic
+    document.getElementById("end-call-btn").addEventListener("click", function() {
+      if (localStream) localStream.getTracks().forEach(t => t.stop());
+      if (screenShareStream) screenShareStream.getTracks().forEach(t => t.stop());
+      Object.values(peers).forEach(p => p.close && p.close());
+      socket.emit("leave-room", meetingId);
+      window.location.href = "index.html";
+    });
   </script>
 </body>
 </html>
