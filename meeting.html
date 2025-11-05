@@ -570,26 +570,19 @@ video.video-participant {
                 labelEl.textContent = state ? activeLabel : inactiveLabel;
             }
 
-            function renderParticipants(){
-                participantsList.innerHTML='';
-                Object.values(participants).forEach(u => {
-                    const li = document.createElement('li');
-                    const audioIcon = document.createElement('i');
-                    audioIcon.classList.add('fas');
-                    audioIcon.classList.add(u.isAudioMuted ? 'fa-microphone-slash' : 'fa-microphone');
-                    audioIcon.style.color = u.isAudioMuted ? '#e74c3c' : '#2ecc71';
-                    
-                    const videoIcon = document.createElement('i');
-                    videoIcon.classList.add('fas');
-                    videoIcon.classList.add(u.isVideoMuted ? 'fa-video-slash' : 'fa-video');
-                    videoIcon.style.color = u.isVideoMuted ? '#e74c3c' : '#2ecc71';
-                    
-                    li.appendChild(audioIcon);
-                    li.appendChild(videoIcon);
-                    li.innerHTML += `<span>${u.name} ${u.socketId === socket.id ? '(You)' : ''}</span>`;
-                    participantsList.appendChild(li);
-                });
-            }
+            function renderParticipants() {
+                const participantsList = document.getElementById("participants-list");
+                participantsList.innerHTML = "";
+                Object.values(participants).forEach(u => {
+                  const li = document.createElement("li");
+                  li.innerHTML = `
+                    <i class="fas ${u.isAudioMuted ? "fa-microphone-slash" : "fa-microphone"}" style="color:${u.isAudioMuted ? "#e74c3c" : "#2ecc71"}"></i>
+                    <i class="fas ${u.isVideoMuted ? "fa-video-slash" : "fa-video"}" style="color:${u.isVideoMuted ? "#e74c3c" : "#2ecc71"}"></i>
+                    <span>${u.name}${u.socketId === socket.id ? " (You)" : ""}</span>`;
+                  participantsList.appendChild(li);
+                });
+              }
+
 
             toggleAudioBtn.addEventListener('click', ()=>{
                 if(!localStream) return;
